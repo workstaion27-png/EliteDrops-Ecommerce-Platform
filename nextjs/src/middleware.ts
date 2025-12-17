@@ -1,0 +1,145 @@
+import { NextRequest, NextResponse } from 'next/server'
+
+// مسار لوحة التحكم المخصص (يتم قراءته من متغيرات البيئة)
+const ADMIN_ROUTE = process.env.ADMIN_ROUTE || '/dashboard_control_2024'
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  
+  // التحقق من الوصول للوحة التحكم
+  if (pathname.startsWith(ADMIN_ROUTE) || pathname.startsWith('/admin')) {
+    return handleAdminAccess(request)
+  }
+  
+  return NextResponse.next()
+}
+
+function handleAdminAccess(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  const isAdminRoute = pathname.startsWith(ADMIN_ROUTE) || pathname.startsWith('/admin')
+  
+  // إذا كان المسار القديم (/admin) أعيد التوجيه للمسار الجديد
+  if (pathname.startsWith('/admin') && ADMIN_ROUTE !== '/admin') {
+    const newPath = pathname.replace('/admin', ADMIN_ROUTE)
+    return NextResponse.redirect(new URL(newPath, request.url))
+  }
+  
+  // التحقق من الجلسة
+  const session = getSessionFromRequest(request)
+  
+  if (!session) {
+    // إعادة توجيه لصفحة تسجيل الدخول
+    const loginUrl = new URL(`${ADMIN_ROUTE}/login`, request.url)
+    loginUrl.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+  
+  // التحقق من صحة الجلسة
+  if (!isValidSession(session)) {
+    // حذف session غير صالح
+    const response = NextResponse.redirect(new URL(`${ADMIN_ROUTE}/login`, request.url))
+    deleteSessionFromResponse(response)
+    return response
+  }
+  
+  // تحديث نشاط الجلسة
+  updateSessionActivity(request, session)
+  
+  return NextResponse.next()
+}
+
+// استخراج الجلسة من request
+function getSessionFromRequest(request: NextRequest) {
+  // محاولة من cookies
+  const sessionCookie = request.cookies.get('admin_session')?.value
+  
+  // محاولة من headers (لـ API calls)
+  const sessionHeader = request.headers.get('x-admin-session')
+  
+  if (sessionCookie) {
+    try {
+      return JSON.parse(sessionCookie)
+    } catch {
+      return null
+    }
+  }
+  
+  if (sessionHeader) {
+    try {
+      return JSON.parse(sessionHeader)
+    } catch {
+      return null
+    }
+  }
+  
+  return null
+}
+
+// التحقق من صحة الجلسة
+function isValidSession(session: any): boolean {
+  if (!session || !session.isAuthenticated || !session.token) {
+    return false
+  }
+  
+  // التحقق من انتهاء صلاحية الجلسة
+  const now = Date.now()
+  const loginTime = session.loginTime || 0
+  const sessionTimeout = parseInt(process.env.SESSION_TIMEOUT || '3600') * 1000 // 1 hour
+  
+  if (now - loginTime > sessionTimeout) {
+    return false
+  }
+  
+  // التحقق من نشاط المستخدم (30 دقيقة idle timeout)
+  const lastActivity = session.lastActivity || 0
+  const idleTimeout = 30 * 60 * 1000 // 30 minutes
+  
+  if (now - lastActivity > idleTimeout) {
+    return false
+  }
+  
+  // التحقق من صحة token
+  if (!isValidToken(session.token)) {
+    return false
+  }
+  
+  return true
+}
+
+// التحقق من صحة token
+function isValidToken(token: string): boolean {
+  return token && token.length === 64 && /^[A-Za-z0-9]+$/.test(token)
+}
+
+// تحديث نشاط الجلسة
+function updateSessionActivity(request: NextRequest, session: any) {
+  const updatedSession = {
+    ...session,
+    lastActivity: Date.now()
+  }
+  
+  // تحديث في response headers للاستخدام في client
+  const response = NextResponse.next()
+  response.headers.set('x-session-updated', 'true')
+  
+  return response
+}
+
+// حذف الجلسة من response
+function deleteSessionFromResponse(response: NextResponse) {
+  response.cookies.delete('admin_session')
+  response.headers.set('x-session-cleared', 'true')
+}
+
+// إعداد headers للحماية
+export const config = {
+  matcher: [
+    /*
+     * تطابق جميع طلبات المسارات باستثناء:
+     * - api routes
+     * - ملفات الـ static (_next/static, images, etc.)
+     * - ملفات الـ public
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}

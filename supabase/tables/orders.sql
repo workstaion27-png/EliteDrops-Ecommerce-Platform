@@ -1,0 +1,21 @@
+CREATE TABLE orders (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    customer_id UUID,
+    user_id UUID,
+    order_number TEXT UNIQUE NOT NULL,
+    status TEXT DEFAULT 'pending',
+    total_amount DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2),
+    shipping_cost DECIMAL(10,2) DEFAULT 0,
+    tax_amount DECIMAL(10,2) DEFAULT 0,
+    currency TEXT DEFAULT 'usd',
+    stripe_payment_intent_id TEXT,
+    cj_order_id TEXT,
+    shipping_address JSONB,
+    billing_address JSONB,
+    customer_email TEXT,
+    tracking_number TEXT,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
