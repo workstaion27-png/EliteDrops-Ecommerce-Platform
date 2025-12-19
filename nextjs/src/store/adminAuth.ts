@@ -71,8 +71,8 @@ export const useAdminAuthStore = create<AdminAuthStore>()(
         const session = get().session
         
         if (!session) {
-          // محاولة است localStorage
-         رجاع الجلسة من if (typeof window !== 'undefined') {
+          // محاولة استرجاع الجلسة من localStorage
+          if (typeof window !== 'undefined') {
             const stored = localStorage.getItem('admin_session')
             if (stored) {
               try {
