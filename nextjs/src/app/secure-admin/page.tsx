@@ -165,12 +165,12 @@ export default function SecureAdminPage() {
     
     const currentPeriodRevenue = orders
       .filter(o => new Date(o.created_at) >= periodStart)
-      .reduce((sum, o) => sum + (parseFloat(o.total_amount) || 0), 0)
+      .reduce((sum, o) => sum + (o.total_amount || 0), 0)
     
     const previousPeriodStart = new Date(periodStart.getTime() - (now.getTime() - periodStart.getTime()))
     const previousPeriodRevenue = orders
       .filter(o => new Date(o.created_at) >= previousPeriodStart && new Date(o.created_at) < periodStart)
-      .reduce((sum, o) => sum + (parseFloat(o.total_amount) || 0), 0)
+      .reduce((sum, o) => sum + (o.total_amount || 0), 0)
     
     if (previousPeriodRevenue === 0) return 100
     
