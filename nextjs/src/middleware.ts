@@ -6,6 +6,11 @@ const ADMIN_ROUTE = process.env.ADMIN_ROUTE || '/dashboard_control_2024'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
+  // استثناء صفحة تسجيل الدخول من middleware
+  if (pathname === `${ADMIN_ROUTE}/login` || pathname === '/admin/login') {
+    return NextResponse.next()
+  }
+  
   // التحقق من الوصول للوحة التحكم
   if (pathname.startsWith(ADMIN_ROUTE) || pathname.startsWith('/admin')) {
     return handleAdminAccess(request)
@@ -19,7 +24,8 @@ function handleAdminAccess(request: NextRequest) {
   const isAdminRoute = pathname.startsWith(ADMIN_ROUTE) || pathname.startsWith('/admin')
   
   // إذا كان المسار القديم (/admin) أعيد التوجيه للمسار الجديد
-  if (pathname.startsWith('/admin') && ADMIN_ROUTE !== '/admin') {
+  // لكن فقط إذا لم نكن في صفحة login
+  if (pathname.startsWith('/admin') && ADMIN_ROUTE !== '/admin' && !pathname.endsWith('/login')) {
     const newPath = pathname.replace('/admin', ADMIN_ROUTE)
     return NextResponse.redirect(new URL(newPath, request.url))
   }
@@ -27,16 +33,23 @@ function handleAdminAccess(request: NextRequest) {
   // التحقق من الجلسة
   const session = getSessionFromRequest(request)
   
+  // إذا لم توجد جلسة، إعادة توجيه لصفحة تسجيل الدخول
   if (!session) {
-    // إعادة توجيه لصفحة تسجيل الدخول
-    const loginUrl = new URL(`${ADMIN_ROUTE}/login`, request.url)
-    loginUrl.searchParams.set('redirect', pathname)
+    // إنشاء URL آمن للـ login
+    const loginPath = `${ADMIN_ROUTE}/login`
+    const loginUrl = new URL(loginPath, request.url)
+    
+    // إضافة redirect parameter فقط إذا كان المسار الحالي ليس login
+    if (!pathname.endsWith('/login')) {
+      loginUrl.searchParams.set('redirect', pathname)
+    }
+    
     return NextResponse.redirect(loginUrl)
   }
   
   // التحقق من صحة الجلسة
   if (!isValidSession(session)) {
-    // حذف session غير صالح
+    // حذف session غير صالح وإنشاء response آمن
     const response = NextResponse.redirect(new URL(`${ADMIN_ROUTE}/login`, request.url))
     deleteSessionFromResponse(response)
     return response
@@ -135,11 +148,12 @@ function deleteSessionFromResponse(response: NextResponse) {
 export const config = {
   matcher: [
     /*
-     * تطابق جميع طلبات المسارات باستثناء:
-     * - api routes
-     * - ملفات الـ static (_next/static, images, etc.)
-     * - ملفات الـ public
+     * تطابق فقط مسارات لوحة الإدارة:
+     * - المسار الجديد: /dashboard_control_2024/*
+     * - المسار القديم: /admin/*
+     * - صفحات API الخاصة بالإدارة
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/dashboard_control_2024/:path*',
+    '/admin/:path*',
   ],
 }
