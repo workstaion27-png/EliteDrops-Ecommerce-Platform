@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js'
-import { ArrowLeft, ShoppingBag, CreditCard, Truck, Shield } from 'lucide-react'
+import { ArrowLeft, ShoppingBag, CreditCard, Truck, Shield, Check } from 'lucide-react'
 import Link from 'next/link'
 import { useCartStore } from '@/store/cart'
 import { supabase } from '@/lib/supabase'
@@ -95,13 +95,15 @@ export default function CheckoutPage() {
         .eq('order_number', orderNumber)
 
       // إضافة عناصر الطلب
+      const orderId = await supabase
+        .from('orders')
+        .select('id')
+        .eq('order_number', orderNumber)
+        .single()
+        .then(res => res.data?.id || '')
+      
       const orderItems = items.map(item => ({
-        order_id: (await supabase
-          .from('orders')
-          .select('id')
-          .eq('order_number', orderNumber)
-          .single()
-        ).data?.id || '',
+        order_id: orderId,
         product_name: item.product.name,
         quantity: item.quantity,
         price_at_time: item.product.price,
@@ -180,7 +182,7 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-slate-50 pt-16">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <Link to="/cart" className="inline-flex items-center text-slate-600 hover:text-sky-600 mb-6">
+        <Link href="/cart" className="inline-flex items-center text-slate-600 hover:text-sky-600 mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
           العودة إلى السلة
         </Link>
