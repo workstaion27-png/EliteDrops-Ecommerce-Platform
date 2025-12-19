@@ -62,6 +62,10 @@ export default function Footer() {
           <div className="flex space-x-4 mt-4 md:mt-0">
             <Link href="/privacy" className="text-slate-400 text-sm hover:text-white">Privacy Policy</Link>
             <Link href="/terms" className="text-slate-400 text-sm hover:text-white">Terms of Service</Link>
+            {/* رابط مخفي للوصول للوحة التحكم */}
+            <Link href="/admin" className="text-slate-600 text-xs hover:text-slate-400 transition-colors">
+              ⚙️ Admin
+            </Link>
           </div>
         </div>
       </div>
