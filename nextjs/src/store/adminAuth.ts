@@ -173,7 +173,7 @@ export const securityUtils = {
 
   // التحقق من صحة token
   validateToken: (token: string): boolean => {
-    return token && token.length === 64 && /^[A-Za-z0-9]+$/.test(token)
+    return typeof token === 'string' && token.length === 64 && /^[A-Za-z0-9]+$/.test(token)
   },
 
   // تسجيل محاولات الدخول المشبوهة
