@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { 
   Package, Truck, RefreshCw, Settings, Eye, EyeOff, Check, X, 
-  AlertCircle, Key, Sync, Upload, Download, BarChart3, Clock
+  AlertCircle, Key, RefreshCw, Upload, Download, BarChart3, Clock
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
@@ -249,7 +249,7 @@ export default function CJDropshippingManager({ onUpdate }: CJDropshippingProps)
                 {getSyncStatusText(settings?.sync_status || 'idle')}
               </p>
             </div>
-            <Sync className={`h-12 w-12 ${
+            <RefreshCw className={`h-12 w-12 ${
               settings?.sync_status === 'syncing' ? 'text-blue-600 animate-spin' : 'text-slate-400'
             }`} />
           </div>
@@ -464,7 +464,7 @@ export default function CJDropshippingManager({ onUpdate }: CJDropshippingProps)
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-semibold text-slate-900">حالة المزامنة</h4>
-              <Sync className={`h-8 w-8 ${getSyncStatusColor(settings.sync_status)}`} />
+              <RefreshCw className={`h-8 w-8 ${getSyncStatusColor(settings.sync_status)}`} />
             </div>
             <div className="space-y-3">
               <div className="flex justify-between">

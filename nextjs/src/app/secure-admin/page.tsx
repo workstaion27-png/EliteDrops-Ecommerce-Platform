@@ -21,7 +21,7 @@ type TimeRange = 'today' | 'week' | 'month' | 'year'
 
 export default function SecureAdminPage() {
   const router = useRouter()
-  const { session, login, logout, checkSession, updateActivity, isAuthenticated } = useAdminAuthStore()
+  const { session, login, logout, checkSession, updateActivity } = useAdminAuthStore()
   const [activeTab, setActiveTab] = useState<Tab>('dashboard')
   const [orders, setOrders] = useState<Order[]>([])
   const [products, setProducts] = useState<Product[]>([])
@@ -246,7 +246,7 @@ export default function SecureAdminPage() {
   ]
 
   // عرض صفحة تسجيل الدخول إذا لم يكن مسجل دخول
-  if (!isAuthenticated && !session) {
+  if (!session?.isAuthenticated) {
     return <AdminLogin onLogin={handleLogin} error={error} />
   }
 
