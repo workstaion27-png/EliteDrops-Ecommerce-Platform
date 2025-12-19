@@ -6,13 +6,18 @@ const ADMIN_ROUTE = process.env.ADMIN_ROUTE || '/dashboard_control_2024'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
+  // منع الوصول المباشر لصفحات الإدارة من المتصفح
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+  
   // استثناء صفحة تسجيل الدخول من middleware
-  if (pathname === `${ADMIN_ROUTE}/login` || pathname === '/admin/login') {
+  if (pathname === `${ADMIN_ROUTE}/login`) {
     return NextResponse.next()
   }
   
   // التحقق من الوصول للوحة التحكم
-  if (pathname.startsWith(ADMIN_ROUTE) || pathname.startsWith('/admin')) {
+  if (pathname.startsWith(ADMIN_ROUTE)) {
     return handleAdminAccess(request)
   }
   
@@ -21,25 +26,15 @@ export function middleware(request: NextRequest) {
 
 function handleAdminAccess(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const isAdminRoute = pathname.startsWith(ADMIN_ROUTE) || pathname.startsWith('/admin')
-  
-  // إذا كان المسار القديم (/admin) أعيد التوجيه للمسار الجديد
-  // لكن فقط إذا لم نكن في صفحة login
-  if (pathname.startsWith('/admin') && ADMIN_ROUTE !== '/admin' && !pathname.endsWith('/login')) {
-    const newPath = pathname.replace('/admin', ADMIN_ROUTE)
-    return NextResponse.redirect(new URL(newPath, request.url))
-  }
   
   // التحقق من الجلسة
   const session = getSessionFromRequest(request)
   
   // إذا لم توجد جلسة، إعادة توجيه لصفحة تسجيل الدخول
   if (!session) {
-    // إنشاء URL آمن للـ login
     const loginPath = `${ADMIN_ROUTE}/login`
     const loginUrl = new URL(loginPath, request.url)
     
-    // إضافة redirect parameter فقط إذا كان المسار الحالي ليس login
     if (!pathname.endsWith('/login')) {
       loginUrl.searchParams.set('redirect', pathname)
     }
@@ -49,7 +44,6 @@ function handleAdminAccess(request: NextRequest) {
   
   // التحقق من صحة الجلسة
   if (!isValidSession(session)) {
-    // حذف session غير صالح وإنشاء response آمن
     const response = NextResponse.redirect(new URL(`${ADMIN_ROUTE}/login`, request.url))
     deleteSessionFromResponse(response)
     return response

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, Search, User, Menu, X, Package, Settings } from 'lucide-react'
+import { ShoppingCart, Search, User, Menu, X, Package } from 'lucide-react'
 import { useCartStore } from '@/store/cart'
 
 export default function Navbar() {
@@ -46,15 +46,6 @@ export default function Navbar() {
             <Link href="/about" className="text-slate-600 hover:text-primary-600 transition-colors">
               About
             </Link>
-            {/* رابط الإدارة */}
-            <Link 
-              href="/dashboard_control_2024" 
-              className="flex items-center space-x-1 px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium hover:bg-orange-200 transition-colors border border-orange-200"
-              title="لوحة التحكم (للمدراء فقط)"
-            >
-              <Settings className="h-4 w-4" />
-              <span>Admin</span>
-            </Link>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -91,15 +82,6 @@ export default function Navbar() {
               <Link href="/products" className="text-slate-600 hover:text-primary-600">Products</Link>
               <Link href="/categories" className="text-slate-600 hover:text-primary-600">Categories</Link>
               <Link href="/about" className="text-slate-600 hover:text-primary-600">About</Link>
-              {/* رابط الإدارة في القائمة المنسدلة */}
-              <Link 
-                href="/dashboard_control_2024" 
-                className="flex items-center space-x-2 px-3 py-2 bg-orange-100 text-orange-700 rounded-lg text-sm font-medium hover:bg-orange-200 transition-colors border border-orange-200"
-                title="لوحة التحكم (للمدراء فقط)"
-              >
-                <Settings className="h-4 w-4" />
-                <span>لوحة التحكم (للمدراء)</span>
-              </Link>
             </div>
           </div>
         )}
