@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { 
   Package, Truck, RefreshCw, Settings, Eye, EyeOff, Check, X, 
-  AlertCircle, Key, RefreshCw, Upload, Download, BarChart3, Clock
+  AlertCircle, Key, Upload, Download, BarChart3, Clock
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
