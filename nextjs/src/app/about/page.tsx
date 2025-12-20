@@ -7,9 +7,9 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">About EliteDrops</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">About LuxuryHub</h1>
           <p className="text-xl text-primary-100 max-w-2xl mx-auto">
-            Your trusted destination for premium products at unbeatable prices, shipped directly to your door.
+            Curating luxury lifestyle products with uncompromising quality and exceptional service, delivered to your doorstep worldwide.
           </p>
         </div>
       </section>
@@ -19,14 +19,20 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-slate-900 mb-6 text-center">Our Story</h2>
           <p className="text-lg text-slate-600 leading-relaxed mb-6">
-            EliteDrops was founded with a simple mission: to bring premium products to customers worldwide 
-            without the premium price tag. By partnering with trusted suppliers through CJ Dropshipping, 
-            we are able to offer a curated selection of high-quality products at competitive prices.
+            LuxuryHub was born from a vision to democratize luxury lifestyle products without compromising on 
+            quality or authenticity. We meticulously curate each item in our collection, working directly with 
+            premium manufacturers and trusted suppliers to ensure every product meets our exacting standards.
+          </p>
+          <p className="text-lg text-slate-600 leading-relaxed mb-6">
+            Our commitment goes beyond just selling products – we're building lasting relationships with our customers. 
+            Every order is personally overseen by our quality team, and our customer success specialists work around 
+            the clock to ensure your shopping experience exceeds expectations. When you choose LuxuryHub, you're 
+            not just making a purchase; you're joining a community that values quality, style, and exceptional service.
           </p>
           <p className="text-lg text-slate-600 leading-relaxed">
-            Our team works tirelessly to source the best products, ensure quality control, and provide 
-            exceptional customer service. We believe that everyone deserves access to great products, 
-            and we are committed to making that a reality.
+            We believe luxury should be accessible, transparent, and trustworthy. That's why we provide detailed 
+            product information, authentic customer reviews, and a seamless order tracking experience. Your trust 
+            is our greatest asset, and we work tirelessly to earn and maintain it with every interaction.
           </p>
         </div>
       </section>
@@ -40,36 +46,36 @@ export default function AboutPage() {
               <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Package className="h-8 w-8 text-primary-600" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Quality Products</h3>
+              <h3 className="font-semibold text-slate-900 mb-2">Curated Luxury</h3>
               <p className="text-slate-600 text-sm">
-                Every product is carefully selected and quality checked before listing.
+                Each product is hand-selected and undergoes rigorous quality inspection to meet luxury standards.
               </p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="h-8 w-8 text-primary-600" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Customer First</h3>
+              <h3 className="font-semibold text-slate-900 mb-2">Client-Centric Service</h3>
               <p className="text-slate-600 text-sm">
-                Your satisfaction is our top priority with 24/7 support.
+                Dedicated support team ensuring personalized attention and complete satisfaction.
               </p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="h-8 w-8 text-primary-600" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Best Prices</h3>
+              <h3 className="font-semibold text-slate-900 mb-2">Exceptional Value</h3>
               <p className="text-slate-600 text-sm">
-                Competitive pricing without compromising on quality.
+                Premium quality at fair prices, delivering unmatched value in every purchase.
               </p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Globe className="h-8 w-8 text-primary-600" />
               </div>
-              <h3 className="font-semibold text-slate-900 mb-2">Global Shipping</h3>
+              <h3 className="font-semibold text-slate-900 mb-2">Worldwide Excellence</h3>
               <p className="text-slate-600 text-sm">
-                Fast and reliable shipping to customers worldwide.
+                Seamless global delivery with full tracking and white-glove service.
               </p>
             </div>
           </div>
@@ -81,7 +87,7 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Shop?</h2>
           <p className="text-primary-100 mb-8">
-            Explore our collection of premium products and experience the EliteDrops difference.
+            Discover our curated luxury collection and experience the LuxuryHub standard of excellence.
           </p>
           <Link
             href="/products"
