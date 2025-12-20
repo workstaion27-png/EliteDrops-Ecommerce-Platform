@@ -208,8 +208,8 @@ export default function AdminDashboard() {
                                 {order.status}
                               </span>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate <button className="text-primary-500">
-                             -600 hover:text-primary-900">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                              <button className="text-primary-600 hover:text-primary-900">
                                 <Eye className="h-4 w-4" />
                               </button>
                             </td>
