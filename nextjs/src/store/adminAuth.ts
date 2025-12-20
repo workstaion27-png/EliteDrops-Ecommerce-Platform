@@ -34,11 +34,11 @@ function isValidTokenFormat(token: string): boolean {
   return typeof token === 'string' && token.length === 64 && /^[A-Za-z0-9]+$/.test(token)
 }
 
-export const useAdminAuthStore = create<AdminAuthState>((set, get) => ({
+export const useAdminAuth = create<AdminAuthState>((set, get) => ({
   session: null,
 
   login: async (credentials: { username: string; password: string }): Promise<boolean> => {
-    // قراءة بيانات تسجيل الدخول من متغيرات البيئة
+    // Read login credentials from environment variables
     const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'luxuryhub_admin_2024'
     const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'LuxuryAdminPass123'
 
@@ -51,7 +51,7 @@ export const useAdminAuthStore = create<AdminAuthState>((set, get) => ({
         lastActivity: Date.now(),
       }
 
-      // حفظ الجلسة في localStorage
+      // Save session to localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('luxuryhub_admin_session', JSON.stringify(session))
       }
@@ -64,7 +64,7 @@ export const useAdminAuthStore = create<AdminAuthState>((set, get) => ({
   },
 
   logout: () => {
-    // حذف الجلسة من localStorage
+    // Remove session from localStorage
     if (typeof window !== 'undefined') {
       localStorage.removeItem('luxuryhub_admin_session')
     }
@@ -76,14 +76,14 @@ export const useAdminAuthStore = create<AdminAuthState>((set, get) => ({
     const { session } = get()
     
     if (!session) {
-      // محاولة استرجاع الجلسة من localStorage
+      // Try to retrieve session from localStorage
       if (typeof window !== 'undefined') {
         try {
           const stored = localStorage.getItem('luxuryhub_admin_session')
           if (stored) {
             const parsedSession = JSON.parse(stored)
             
-            // التحقق من صحة الجلسة
+            // Validate session
             const now = Date.now()
             const sessionTimeout = 3600 * 1000 // 1 hour
             const idleTimeout = 30 * 60 * 1000 // 30 minutes
@@ -98,7 +98,7 @@ export const useAdminAuthStore = create<AdminAuthState>((set, get) => ({
               set({ session: parsedSession })
               return true
             } else {
-              // جلسة منتهية الصلاحية، حذفها
+              // Expired session, remove it
               localStorage.removeItem('luxuryhub_admin_session')
             }
           }
@@ -110,7 +110,7 @@ export const useAdminAuthStore = create<AdminAuthState>((set, get) => ({
       return false
     }
 
-    // التحقق من انتهاء صلاحية الجلسة
+    // Check session expiration
     const now = Date.now()
     const sessionTimeout = 3600 * 1000 // 1 hour
     const idleTimeout = 30 * 60 * 1000 // 30 minutes
@@ -131,7 +131,7 @@ export const useAdminAuthStore = create<AdminAuthState>((set, get) => ({
         lastActivity: Date.now()
       }
       
-      // تحديث في localStorage
+      // Update in localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('luxuryhub_admin_session', JSON.stringify(updatedSession))
       }
