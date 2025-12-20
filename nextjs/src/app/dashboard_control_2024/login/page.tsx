@@ -19,9 +19,10 @@ export default function AdminLogin() {
     setLoading(true)
     setError('')
 
-    // Simple admin credentials check
-    if (username === 'admin' && password === 'admin123') {
-      login()
+    // Login using adminAuth store with environment variables
+    const success = await login({ username, password })
+    
+    if (success) {
       router.push('/dashboard_control_2024')
     } else {
       setError('Invalid username or password')
