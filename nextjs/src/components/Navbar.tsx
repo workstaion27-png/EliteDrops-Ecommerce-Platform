@@ -28,9 +28,14 @@ export default function Navbar() {
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center space-x-2">
-            <Package className="h-8 w-8 text-primary-600" />
-            <span className="text-xl font-bold text-slate-900">EliteDrops</span>
+          <Link href="/" className="flex items-center space-x-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-luxury-gold to-luxury-dark-gold rounded-xl flex items-center justify-center shadow-xl">
+              <Package className="h-7 w-7 text-white" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold text-luxury-black tracking-tight">LuxuryHub</span>
+              <span className="text-xs text-luxury-gold font-medium tracking-widest uppercase">Premium Collection</span>
+            </div>
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">

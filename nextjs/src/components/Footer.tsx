@@ -9,7 +9,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <Package className="h-8 w-8 text-primary-400" />
-              <span className="text-xl font-bold">EliteDrops</span>
+              <span className="text-xl font-bold">LuxuryHub</span>
             </div>
             <p className="text-slate-400 text-sm">
               Premium products at unbeatable prices. Fast worldwide shipping and excellent customer service.
@@ -33,6 +33,7 @@ export default function Footer() {
               <li><Link href="/returns" className="hover:text-white transition-colors">Returns Policy</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
               <li><Link href="/track-order" className="hover:text-white transition-colors">Track Order</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link></li>
             </ul>
           </div>
 
@@ -41,7 +42,7 @@ export default function Footer() {
             <ul className="space-y-2 text-slate-400 text-sm">
               <li className="flex items-center space-x-2">
                 <Mail className="h-4 w-4" />
-                <span>support@elitedrops.com</span>
+                <span>support@luxuryhub.com</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone className="h-4 w-4" />
@@ -57,7 +58,7 @@ export default function Footer() {
 
         <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-slate-400 text-sm">
-            2024 EliteDrops. All rights reserved.
+            2024 LuxuryHub. All rights reserved.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <Link href="/privacy" className="text-slate-400 text-sm hover:text-white">Privacy Policy</Link>
