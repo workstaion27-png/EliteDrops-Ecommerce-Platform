@@ -7,6 +7,9 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { useCartStore } from '@/store/cart'
 import { Product } from '@/types'
+import ProductReviews from '@/components/ProductReviews'
+import CountdownTimer from '@/components/CountdownTimer'
+import TrustBadges from '@/components/TrustBadges'
 
 export default function ProductDetailPage() {
   const params = useParams()
@@ -136,7 +139,19 @@ export default function ProductDetailPage() {
               )}
             </div>
 
+            {/* Countdown Timer - Show when there's a discount */}
+            {product.compare_price && (
+              <div className="mb-6">
+                <CountdownTimer />
+              </div>
+            )}
+
             <p className="text-slate-600 mb-8 leading-relaxed">{product.description}</p>
+
+            {/* Customer Reviews */}
+            <div className="mb-8">
+              <ProductReviews productId={product.id} />
+            </div>
 
             {/* Quantity */}
             <div className="mb-6">
@@ -177,6 +192,11 @@ export default function ProductDetailPage() {
               <button className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50">
                 <Heart className="h-5 w-5 text-slate-600" />
               </button>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="mb-6">
+              <TrustBadges />
             </div>
 
             {/* Features */}
