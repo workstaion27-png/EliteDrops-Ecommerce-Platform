@@ -104,7 +104,7 @@ export default function AccountPage() {
                 {isLogin ? 'Welcome Back' : 'Create Account'}
               </h1>
               <p className="text-slate-600 mt-2">
-                {isLogin ? 'Sign in to your account' : 'Join EliteDrops today'}
+                {isLogin ? 'Sign in to your account' : 'Join LuxuryHub today'}
               </p>
             </div>
 
