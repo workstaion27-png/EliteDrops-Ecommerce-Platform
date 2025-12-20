@@ -7,14 +7,12 @@ import {
   Package, 
   ShoppingCart, 
   Users, 
-  TrendingUp, 
   DollarSign,
   Eye,
   LogOut,
   Bell,
   Settings,
   BarChart3,
-  Globe,
   Shield
 } from 'lucide-react'
 import { useAdminAuth } from '@/store/adminAuth'
@@ -39,7 +37,7 @@ export default function AdminDashboard() {
     router.push('/dashboard_control_2024/login')
   }
 
-  // Mock data for demonstration
+  // Mock data
   const stats = {
     totalOrders: 1247,
     totalRevenue: 45892,
@@ -50,7 +48,7 @@ export default function AdminDashboard() {
   const recentOrders = [
     { id: '#1234', customer: 'John Doe', product: 'Premium Watch', amount: 299.99, status: 'Shipped' },
     { id: '#1235', customer: 'Jane Smith', product: 'Luxury Bag', amount: 599.99, status: 'Processing' },
-    { id: '#1236', customer: 'Mike Johnson', product: 'Designer Sunglasses', amount: 199.99, status: 'Delivered' },
+    { id: '#1236', customer: 'Mike Johnson', product: 'Designer Sunglasses', amount: 199.99, status: 'Delivered' }
   ]
 
   return (
@@ -99,7 +97,7 @@ export default function AdminDashboard() {
                 { id: 'products', label: 'Products', icon: Package },
                 { id: 'customers', label: 'Customers', icon: Users },
                 { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-                { id: 'settings', label: 'Settings', icon: Settings },
+                { id: 'settings', label: 'Settings', icon: Settings }
               ].map((item) => {
                 const Icon = item.icon
                 return (
@@ -222,39 +220,7 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {activeTab === 'orders' && (
-              <div className="bg-white rounded-lg shadow-sm">
-                <div className="px-6 py-4 border-b border-slate-200">
-                  <h3 className="text-lg font-semibold text-slate-900">Order Management</h3>
-                  <p className="text-sm text-slate-500">Manage all customer orders and track shipments</p>
-                </div>
-                <div className="p-6">
-                  <div className="text-center py-12">
-                    <ShoppingCart className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-slate-900 mb-2">Order Management</h4>
-                    <p className="text-slate-500">Advanced order management features will be implemented here.</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'products' && (
-              <div className="bg-white rounded-lg shadow-sm">
-                <div className="px-6 py-4 border-b border-slate-200">
-                  <h3 className="text-lg font-semibold text-slate-900">Product Management</h3>
-                  <p className="text-sm text-slate-500">Manage your product catalog and inventory</p>
-                </div>
-                <div className="p-6">
-                  <div className="text-center py-12">
-                    <Package className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-slate-900 mb-2">Product Catalog</h4>
-                    <p className="text-slate-500">Advanced product management features will be implemented here.</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {(activeTab === 'customers' || activeTab === 'analytics' || activeTab === 'settings') && (
+            {activeTab !== 'overview' && (
               <div className="bg-white rounded-lg shadow-sm">
                 <div className="px-6 py-4 border-b border-slate-200">
                   <h3 className="text-lg font-semibold text-slate-900 capitalize">{activeTab}</h3>
@@ -263,6 +229,8 @@ export default function AdminDashboard() {
                 <div className="p-6">
                   <div className="text-center py-12">
                     <div className="h-12 w-12 bg-slate-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                      {activeTab === 'orders' && <ShoppingCart className="h-6 w-6 text-slate-400" />}
+                      {activeTab === 'products' && <Package className="h-6 w-6 text-slate-400" />}
                       {activeTab === 'customers' && <Users className="h-6 w-6 text-slate-400" />}
                       {activeTab === 'analytics' && <BarChart3 className="h-6 w-6 text-slate-400" />}
                       {activeTab === 'settings' && <Settings className="h-6 w-6 text-slate-400" />}
