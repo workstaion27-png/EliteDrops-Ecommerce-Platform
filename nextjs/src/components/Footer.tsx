@@ -22,17 +22,17 @@ export default function Footer() {
               <li><Link href="/products" className="hover:text-white transition-colors">All Products</Link></li>
               <li><Link href="/categories" className="hover:text-white transition-colors">Categories</Link></li>
               <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+              <li><a href="mailto:support@luxuryhub.com" className="hover:text-white transition-colors">Contact</a></li>
             </ul>
           </div>
 
           <div>
             <h3 className="font-semibold mb-4">Customer Service</h3>
             <ul className="space-y-2 text-slate-400 text-sm">
-              <li><Link href="/shipping" className="hover:text-white transition-colors">Shipping Info</Link></li>
-              <li><Link href="/returns" className="hover:text-white transition-colors">Returns Policy</Link></li>
-              <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
+              <li><Link href="/shipping-policy" className="hover:text-white transition-colors">Shipping Info</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-white transition-colors">Returns Policy</Link></li>
               <li><Link href="/track-order" className="hover:text-white transition-colors">Track Order</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
               <li><Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link></li>
             </ul>
           </div>
@@ -61,8 +61,8 @@ export default function Footer() {
             2024 LuxuryHub. All rights reserved.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
-            <Link href="/privacy" className="text-slate-400 text-sm hover:text-white">Privacy Policy</Link>
-            <Link href="/terms" className="text-slate-400 text-sm hover:text-white">Terms of Service</Link>
+            <Link href="/privacy-policy" className="text-slate-400 text-sm hover:text-white">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="text-slate-400 text-sm hover:text-white">Terms of Service</Link>
           </div>
         </div>
       </div>
