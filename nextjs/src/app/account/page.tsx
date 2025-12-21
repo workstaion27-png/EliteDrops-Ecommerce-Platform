@@ -23,12 +23,24 @@ export default function AccountPage() {
 
   const fetchOrders = async () => {
     try {
-      const { data } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('created_at', { ascending: false })
-      setOrders(data || [])
+      // Mock orders data
+      const mockOrders = [
+        {
+          id: '1',
+          order_number: 'LH-2024-001',
+          status: 'delivered',
+          total_amount: 299.99,
+          created_at: '2024-12-15T10:00:00Z'
+        },
+        {
+          id: '2',
+          order_number: 'LH-2024-002',
+          status: 'shipped',
+          total_amount: 149.99,
+          created_at: '2024-12-10T14:30:00Z'
+        }
+      ]
+      setOrders(mockOrders)
     } catch (err) {
       console.error('Error fetching orders:', err)
     }

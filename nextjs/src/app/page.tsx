@@ -19,15 +19,63 @@ export default function HomePage() {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false })
-        .limit(8)
-
-      if (error) throw error
-      setFeaturedProducts(data || [])
+      // Mock data for featured products
+      const mockFeaturedProducts: Product[] = [
+        {
+          id: '1',
+          name: 'Luxury Wireless Headphones',
+          description: 'Premium noise-cancelling wireless headphones',
+          price: 299.99,
+          compare_price: 399.99,
+          images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400'],
+          category: 'Electronics',
+          inventory_count: 25,
+          is_active: true,
+          created_at: '2024-12-01T10:00:00Z',
+          updated_at: '2024-12-01T10:00:00Z'
+        },
+        {
+          id: '2',
+          name: 'Elegant Smart Watch',
+          description: 'Sophisticated smartwatch with health monitoring',
+          price: 449.99,
+          compare_price: 599.99,
+          images: ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'],
+          category: 'Electronics',
+          inventory_count: 18,
+          is_active: true,
+          created_at: '2024-12-02T10:00:00Z',
+          updated_at: '2024-12-02T10:00:00Z'
+        },
+        {
+          id: '3',
+          name: 'Premium Leather Wallet',
+          description: 'Handcrafted genuine leather wallet',
+          price: 89.99,
+          compare_price: 129.99,
+          images: ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400'],
+          category: 'Accessories',
+          inventory_count: 32,
+          is_active: true,
+          created_at: '2024-12-03T10:00:00Z',
+          updated_at: '2024-12-03T10:00:00Z'
+        },
+        {
+          id: '4',
+          name: 'Luxury Home Fragrance',
+          description: 'Premium scented candles',
+          price: 45.99,
+          compare_price: 65.99,
+          images: ['https://images.unsplash.com/photo-1602874801000-b9263cfe1001?w=400'],
+          category: 'Home',
+          inventory_count: 41,
+          is_active: true,
+          created_at: '2024-12-04T10:00:00Z',
+          updated_at: '2024-12-04T10:00:00Z'
+        }
+      ]
+      
+      setFeaturedProducts(mockFeaturedProducts)
     } catch (error) {
       console.error('Error fetching products:', error)
     } finally {

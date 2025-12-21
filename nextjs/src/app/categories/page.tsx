@@ -12,19 +12,14 @@ export default function CategoriesPage() {
   }, [])
 
   const fetchCategories = async () => {
-    const { data } = await supabase
-      .from('products')
-      .select('category')
-      .eq('is_active', true)
-
-    if (data) {
-      const counts = data.reduce((acc: Record<string, number>, item) => {
-        const cat = item.category || 'Other'
-        acc[cat] = (acc[cat] || 0) + 1
-        return acc
-      }, {})
-      setCategoryCounts(counts)
+    // Mock category counts
+    const mockCounts = {
+      'Electronics': 45,
+      'Accessories': 32,
+      'Home': 28,
+      'Fitness': 24
     }
+    setCategoryCounts(mockCounts)
   }
 
   const categories = [
