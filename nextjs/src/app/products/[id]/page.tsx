@@ -142,7 +142,10 @@ export default function ProductDetailPage() {
             {/* Countdown Timer - Show when there's a discount */}
             {product.compare_price && (
               <div className="mb-6">
-                <CountdownTimer />
+                <CountdownTimer 
+                  endDate={new Date(Date.now() + 24 * 60 * 60 * 1000)} 
+                  title="Limited Time Offer" 
+                />
               </div>
             )}
 
