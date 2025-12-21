@@ -25,36 +25,26 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  XCircle
+  XCircle,
+  ShoppingBag
 } from 'lucide-react'
+import OrderManagement from '@/components/admin/OrderManagement'
+import CJDropshippingIntegration from '@/components/admin/CJDropshippingIntegration'
 
 export default function AdminPanel() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('dashboard')
-  const [orders, setOrders] = useState([
-    { id: 'LH-2024-001', customer: 'John Doe', total: 299.99, status: 'shipped', date: '2024-12-20' },
-    { id: 'LH-2024-002', customer: 'Jane Smith', total: 599.99, status: 'processing', date: '2024-12-19' },
-    { id: 'LH-2024-003', customer: 'Mike Johnson', total: 199.99, status: 'delivered', date: '2024-12-18' },
-    { id: 'LH-2024-004', customer: 'Sarah Wilson', total: 450.00, status: 'pending', date: '2024-12-21' },
-    { id: 'LH-2024-005', customer: 'David Brown', total: 789.99, status: 'shipped', date: '2024-12-17' }
-  ])
-  
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Luxury Wireless Headphones', category: 'Electronics', price: 299.99, stock: 25, status: 'active' },
-    { id: 2, name: 'Designer Sunglasses', category: 'Accessories', price: 189.99, stock: 15, status: 'active' },
-    { id: 3, name: 'Premium Coffee Grinder', category: 'Home', price: 159.99, stock: 8, status: 'active' },
-    { id: 4, name: 'Fitness Tracker', category: 'Fitness', price: 249.99, stock: 12, status: 'active' },
-    { id: 5, name: 'Luxury Watch', category: 'Accessories', price: 899.99, stock: 5, status: 'active' }
-  ])
-
-  const [customers, setCustomers] = useState([
-    { id: 1, name: 'John Doe', email: 'john@example.com', orders: 3, total: 899.97, joinDate: '2024-01-15' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', orders: 2, total: 599.99, joinDate: '2024-02-20' },
-    { id: 3, name: 'Mike Johnson', email: 'mike@example.com', orders: 1, total: 199.99, joinDate: '2024-03-10' },
-    { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com', orders: 4, total: 1250.00, joinDate: '2023-12-05' },
-    { id: 5, name: 'David Brown', email: 'david@example.com', orders: 2, total: 789.99, joinDate: '2024-04-12' }
-  ])
+  const [orders, setOrders] = useState([])
+  const [products, setProducts] = useState([])
+  const [customers, setCustomers] = useState([])
+  const [dashboardStats, setDashboardStats] = useState({
+    totalOrders: 0,
+    totalRevenue: 0,
+    totalProducts: 0,
+    totalCustomers: 0
+  })
+  const [loading, setLoading] = useState(true)
 
   const router = useRouter()
 
@@ -66,6 +56,7 @@ export default function AdminPanel() {
           const parsedSession = JSON.parse(session)
           if (parsedSession.isAuthenticated) {
             setIsAuthenticated(true)
+            loadDashboardData()
           } else {
             router.push('/admin-control/login')
           }
@@ -78,6 +69,40 @@ export default function AdminPanel() {
     }
     setLoading(false)
   }, [router])
+
+  const loadDashboardData = async () => {
+    try {
+      // Load dashboard stats
+      const statsResponse = await fetch('/api/dashboard/stats')
+      const statsData = await statsResponse.json()
+      if (statsData.success) {
+        setDashboardStats(statsData.stats)
+      }
+
+      // Load recent orders
+      const ordersResponse = await fetch('/api/orders?limit=5')
+      const ordersData = await ordersResponse.json()
+      if (ordersData.success) {
+        setOrders(ordersData.orders || [])
+      }
+
+      // Load recent products
+      const productsResponse = await fetch('/api/products?limit=5')
+      const productsData = await productsResponse.json()
+      if (productsData.success) {
+        setProducts(productsData.products || [])
+      }
+
+      // Load recent customers
+      const customersResponse = await fetch('/api/customers?limit=5')
+      const customersData = await customersResponse.json()
+      if (customersData.success) {
+        setCustomers(customersData.customers || [])
+      }
+    } catch (error) {
+      console.error('Error loading dashboard data:', error)
+    }
+  }
 
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
@@ -626,7 +651,8 @@ export default function AdminPanel() {
           <nav className="flex space-x-8">
             {[
               { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-              { id: 'orders', label: 'Orders', icon: ShoppingCart },
+              { id: 'orders', label: 'Order Management', icon: ShoppingCart },
+              { id: 'cj-dropshipping', label: 'CJdropshipping', icon: Truck },
               { id: 'products', label: 'Products', icon: Package },
               { id: 'customers', label: 'Customers', icon: Users },
               { id: 'analytics', label: 'Analytics', icon: TrendingUp },
@@ -652,7 +678,8 @@ export default function AdminPanel() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'dashboard' && renderDashboard()}
-        {activeTab === 'orders' && renderOrders()}
+        {activeTab === 'orders' && <OrderManagement />}
+        {activeTab === 'cj-dropshipping' && <CJDropshippingIntegration />}
         {activeTab === 'products' && renderProducts()}
         {activeTab === 'customers' && renderCustomers()}
         {activeTab === 'analytics' && renderAnalytics()}
