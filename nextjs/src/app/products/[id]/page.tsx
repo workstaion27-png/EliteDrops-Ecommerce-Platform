@@ -153,7 +153,40 @@ export default function ProductDetailPage() {
 
             {/* Customer Reviews */}
             <div className="mb-8">
-              <ProductReviews productId={product.id} />
+              <ProductReviews 
+                productId={product.id}
+                reviews={[
+                  {
+                    id: '1',
+                    customerName: 'Sarah Johnson',
+                    rating: 5,
+                    comment: 'Excellent quality and fast delivery. Very satisfied with this purchase!',
+                    date: '2024-12-15',
+                    verified: true,
+                    helpful: 12
+                  },
+                  {
+                    id: '2',
+                    customerName: 'Mike Chen',
+                    rating: 4,
+                    comment: 'Good product overall, though delivery took a bit longer than expected.',
+                    date: '2024-12-10',
+                    verified: true,
+                    helpful: 8
+                  },
+                  {
+                    id: '3',
+                    customerName: 'Emma Wilson',
+                    rating: 5,
+                    comment: 'Amazing quality! Will definitely buy again.',
+                    date: '2024-12-08',
+                    verified: true,
+                    helpful: 15
+                  }
+                ]}
+                averageRating={4.7}
+                totalReviews={3}
+              />
             </div>
 
             {/* Quantity */}
