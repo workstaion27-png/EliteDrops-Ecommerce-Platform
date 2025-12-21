@@ -2,37 +2,27 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Lock, User, Eye, EyeOff } from 'lucide-react'
+import { useAdminAuth } from '@/store/adminAuth'
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+  const { login } = useAdminAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    // Default credentials
-    const defaultUsername = 'luxuryhub_admin_2024'
-    const defaultPassword = 'LuxuryAdminPass123'
-
-    if (username === defaultUsername && password === defaultPassword) {
-      // Create session
-      const session = {
-        isAuthenticated: true,
-        username: username,
-        loginTime: Date.now(),
-        lastActivity: Date.now(),
-        token: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-      }
-
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('luxuryhub_admin_session', JSON.stringify(session))
-      }
-      
+    // Login using adminAuth store with environment variables
+    const success = await login({ username, password })
+    
+    if (success) {
       router.push('/dashboard_control_2024')
     } else {
       setError('Invalid username or password')
@@ -45,9 +35,7 @@ export default function AdminLogin() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="mx-auto h-16 w-16 bg-primary-600 rounded-full flex items-center justify-center">
-            <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
+            <Lock className="h-8 w-8 text-white" />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-white">
             LuxuryHub Admin
@@ -65,9 +53,7 @@ export default function AdminLogin() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+                  <User className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
                   id="username"
@@ -88,20 +74,29 @@ export default function AdminLogin() {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
+                  <Lock className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 border border-slate-600 rounded-lg bg-slate-800 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="block w-full pl-10 pr-10 py-3 border border-slate-600 rounded-lg bg-slate-800 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Enter password"
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-300" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-slate-400 hover:text-slate-300" />
+                  )}
+                </button>
               </div>
             </div>
           </div>
