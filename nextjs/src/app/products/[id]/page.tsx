@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { ShoppingCart, Heart, Truck, Shield, ArrowLeft, Plus, Minus } from 'lucide-react'
+import { Gem, Heart, Truck, Shield, ArrowLeft, Plus, Minus } from 'lucide-react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { useCartStore } from '@/store/cart'
@@ -349,7 +349,7 @@ export default function ProductDetailPage() {
                     : 'bg-primary-600 text-white hover:bg-primary-700'
                 }`}
               >
-                <ShoppingCart className="h-5 w-5" />
+                <Gem className="h-5 w-5" />
                 {added ? 'Added to Cart!' : 'Add to Cart'}
               </button>
               <button className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50">

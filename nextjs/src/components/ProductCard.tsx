@@ -2,7 +2,7 @@
 
 import { Product } from '@/types'
 import Link from 'next/link'
-import { ShoppingCart } from 'lucide-react'
+import { Gem } from 'lucide-react'
 import { useCartStore } from '@/store/cart'
 
 interface ProductCardProps {
@@ -40,7 +40,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             onClick={handleAddToCart}
             className="absolute bottom-3 right-3 p-3 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-primary-600 hover:text-white"
           >
-            <ShoppingCart className="h-5 w-5" />
+            <Gem className="h-5 w-5" />
           </button>
         </div>
         

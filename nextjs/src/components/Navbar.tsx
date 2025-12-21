@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, Search, User, Menu, X, Crown } from 'lucide-react'
+import { Gem, Search, User, Menu, X, Crown } from 'lucide-react'
 import { useCartStore } from '@/store/cart'
 
 export default function Navbar() {
@@ -63,7 +63,7 @@ export default function Navbar() {
             </Link>
             
             <Link href="/cart" className="relative p-2 text-slate-600 hover:text-primary-600 transition-colors">
-              <ShoppingCart className="h-5 w-5" />
+              <Gem className="h-5 w-5" />
               {itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs font-bold text-white bg-primary-600 rounded-full">
                   {itemCount}
