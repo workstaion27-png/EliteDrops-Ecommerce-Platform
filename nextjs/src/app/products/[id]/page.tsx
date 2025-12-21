@@ -105,7 +105,7 @@ export default function ProductDetailPage() {
             </div>
             {product.images.length > 1 && (
               <div className="flex gap-2">
-                {product.images.map((img, idx) => (
+                {product.images.map((img: string, idx: number) => (
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
