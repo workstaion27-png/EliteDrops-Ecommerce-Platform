@@ -175,7 +175,7 @@ export default function TrackOrderPage() {
                 <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
                 
                 <div className="space-y-8">
-                  {trackingData.timeline.map((step, index) => (
+                  {trackingData.timeline.map((step: { completed: boolean; status: string; description: string; timestamp: string; icon: any }, index) => (
                     <div key={index} className="relative flex items-start">
                       {/* Step Icon */}
                       <div className={`relative z-10 w-12 h-12 rounded-full flex items-center justify-center ${
