@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     description: 'Discover premium luxury lifestyle products with uncompromising quality and exceptional service.',
     creator: '@luxuryhub',
   },
-  viewport: 'width=device-width, initial-scale=1',
+
   robots: {
     index: true,
     follow: true,
@@ -39,6 +39,11 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({

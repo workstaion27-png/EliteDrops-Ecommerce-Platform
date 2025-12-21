@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { User, Package, LogOut, Settings, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+// Mock authentication for demo purposes
 import { useAuthStore } from '@/store/auth'
 
 export default function AccountPage() {
@@ -52,31 +52,21 @@ export default function AccountPage() {
     setError('')
 
     try {
-      if (isLogin) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-        if (error) throw error
-        if (data.user) {
+      // Mock authentication
+      if (email && password) {
+        // Simulate login/signup
+        setTimeout(() => {
           setUser({ 
-            id: data.user.id, 
-            email: data.user.email || '', 
+            id: 'user_' + Date.now(), 
+            email: email, 
             role: email.includes('admin') ? 'admin' : 'customer' 
           })
-        }
+          setLoading(false)
+        }, 1000)
+        return
       } else {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-        })
-        if (error) throw error
-        if (data.user) {
-          setUser({ 
-            id: data.user.id, 
-            email: data.user.email || '', 
-            role: 'customer' 
-          })
+        throw new Error('Please enter email and password')
+      }
         }
       }
     } catch (err: any) {
@@ -87,7 +77,7 @@ export default function AccountPage() {
   }
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    // Mock logout
     logout()
   }
 
