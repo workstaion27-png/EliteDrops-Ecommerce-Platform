@@ -20,7 +20,7 @@ export const useCartStore = create<CartStore>()(
       addItem: (product, quantity = 1, variant_info) => {
         const items = get().items
         const existingIndex = items.findIndex(
-          item => item.product.id === product.id && 
+          (item: CartItem) => item.product.id === product.id && 
           JSON.stringify(item.variant_info) === JSON.stringify(variant_info)
         )
         
@@ -49,7 +49,7 @@ export const useCartStore = create<CartStore>()(
           return
         }
         set({
-          items: get().items.map(item =>
+          items: get().items.map((item: CartItem) =>
             item.id === itemId ? { ...item, quantity } : item
           )
         })
