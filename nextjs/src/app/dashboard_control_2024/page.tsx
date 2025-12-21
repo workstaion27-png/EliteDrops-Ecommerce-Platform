@@ -23,15 +23,14 @@ export default function AdminDashboard() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check if admin is logged in
     const checkAuth = () => {
       const session = localStorage.getItem('luxuryhub_admin_session')
       if (session) {
         try {
           const parsed = JSON.parse(session)
           const now = Date.now()
-          const sessionTimeout = 3600 * 1000 // 1 hour
-          const idleTimeout = 30 * 60 * 1000 // 30 minutes
+          const sessionTimeout = 3600 * 1000
+          const idleTimeout = 30 * 60 * 1000
           
           if (
             parsed.isAuthenticated &&
@@ -39,13 +38,11 @@ export default function AdminDashboard() {
             now - parsed.lastActivity < idleTimeout
           ) {
             setIsAuthenticated(true)
-            // Update last activity
             localStorage.setItem('luxuryhub_admin_session', JSON.stringify({
               ...parsed,
               lastActivity: now
             }))
           } else {
-            // Expired session
             localStorage.removeItem('luxuryhub_admin_session')
             router.push('/dashboard_control_2024/login')
           }
@@ -79,10 +76,9 @@ export default function AdminDashboard() {
   }
 
   if (!isAuthenticated) {
-    return null // Will redirect to login
+    return null
   }
 
-  // Mock data
   const stats = {
     totalOrders: 1247,
     totalRevenue: 45892,
@@ -100,7 +96,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
@@ -135,7 +130,6 @@ export default function AdminDashboard() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar */}
           <aside className="w-full lg:w-64">
             <nav className="space-y-2">
               <button
@@ -212,11 +206,9 @@ export default function AdminDashboard() {
             </nav>
           </aside>
 
-          {/* Main Content */}
           <main className="flex-1">
             {activeTab === 'overview' && (
               <div className="space-y-8">
-                {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="bg-white rounded-lg p-6 shadow-sm border">
                     <div className="flex items-center justify-between">
@@ -267,7 +259,6 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Recent Orders */}
                 <div className="bg-white rounded-lg shadow-sm border">
                   <div className="px-6 py-4 border-b border-slate-200">
                     <h3 className="text-lg font-semibold text-slate-900">Recent Orders</h3>
