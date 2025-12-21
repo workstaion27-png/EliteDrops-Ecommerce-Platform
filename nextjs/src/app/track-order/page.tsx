@@ -82,7 +82,7 @@ export default function TrackOrderPage() {
   }
 
   const getCurrentStep = () => {
-    return trackingData?.timeline.findIndex(step => !step.completed)
+    return trackingData?.timeline.findIndex((step: { completed: boolean }) => !step.completed)
   }
 
   return (
