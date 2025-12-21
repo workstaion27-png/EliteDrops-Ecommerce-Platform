@@ -1,0 +1,42 @@
+# Environment Variables for Existing Site Update
+# URL: https://elite-drops-ecommerce-platform-k0fh20t8m.vercel.app/
+# Copy these to Vercel Project Settings > Environment Variables
+
+# Supabase Database Configuration (REQUIRED)
+NEXT_PUBLIC_SUPABASE_URL=https://xqajwqrjqgckhgpzrxvw.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxbmp3cXJqcWdjay1ocGd6cnh2dyIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzM2Nzg3ODI5LCJleHAiOjIwNTIzNjM4Mjl9.hz2x0J3l5L8zU5o1o4Yb9m0p3r7c2w8q1v9x4m5s3n9f6j8k1p2q3r4s5t6u7v8w9x0y1z2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6y7z8a9b0c1d2e3f4g5h6i7j8k9l0m1n2o3p4q5r6s7t8u9v0w1x2y3z4a5b6c7d8e9f0g1h2i3j4k5l6m7n8o9p0q1r2s3t4u5v6w7x8y9z0
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxbmp3cXJqcWdjay1ocGd6cnh2dyIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE3MzY3ODc4MjksImV4cCI6MjA1MjM2MzgyOX0.W1s9f0n2c6y1zR4j7t2g8p9b5v3j6k2q1l9r4t7u1m8p3c5n7g4f1h9i3j5k2l6m7r8t9u1v4w5x6y7z8a9b0c1d2e3f4g5h6i7j8k9l0m1n2o3p4q5r6s7t8u9v0w1x2y3z4a5b6c7d8e9f0g1h2i3j4k5l6m7n8o9p0q1r2s3t4u5v6w7x8y9z0
+
+# CJ Dropshipping API Configuration
+CJ_APP_KEY=CJ4990471
+CJ_SECRET_KEY=@api@f291f4ea4b7e4b88b816656fef7d7aa8
+CJ_PARTNER_ID=CJ4990471
+
+# PayPal Payment Gateway Configuration
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=Afci_08L6xFO22HB8UKZh0TZ3gDhONQ7w6yy376gtR522RRNBPqifomIq8O8Z2wFfiCw1o-lZsT8ihMs
+PAYPAL_CLIENT_SECRET=EMpcrKTla8uJjMkzPy6iKSIF8RZ3XBJeQIYbT7mVIknu2JmHyEXWyYncLeoQqxf479-2-6Lui1_HeLOm
+
+# Security Keys
+JWT_SECRET=luxuryhub-super-secret-jwt-key-2025-luxuryhub-ecommerce-platform
+ENCRYPTION_KEY=luxuryhub-encryption-key-2025-secure-crypto-key
+
+# Admin Configuration
+ADMIN_EMAIL=admin@luxuryhub.com
+ADMIN_PASSWORD=luxuryhub-admin-secure-password-2025
+
+# Store Configuration
+STORE_NAME=LuxuryHub
+STORE_URL=https://elite-drops-ecommerce-platform-k0fh20t8m.vercel.app
+STORE_CURRENCY=USD
+STORE_TAX_RATE=0.08
+
+# Optional Payment Gateways (Add if needed later)
+# STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_key
+# STRIPE_SECRET_KEY=sk_test_your_stripe_secret
+
+# Optional Email Configuration (Add if needed later)
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USER=your_email@gmail.com
+# SMTP_PASS=your_app_password
+# EMAIL_FROM=noreply@luxuryhub.com
