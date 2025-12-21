@@ -18,6 +18,35 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
   const [added, setAdded] = useState(false)
+  const [reviews, setReviews] = useState([
+    {
+      id: '1',
+      customerName: 'Sarah Johnson',
+      rating: 5,
+      comment: 'Excellent quality and fast delivery. Very satisfied with this purchase!',
+      date: '2024-12-15',
+      verified: true,
+      helpful: 12
+    },
+    {
+      id: '2',
+      customerName: 'Mike Chen',
+      rating: 4,
+      comment: 'Good product overall, though delivery took a bit longer than expected.',
+      date: '2024-12-10',
+      verified: true,
+      helpful: 8
+    },
+    {
+      id: '3',
+      customerName: 'Emma Wilson',
+      rating: 5,
+      comment: 'Amazing quality! Will definitely buy again.',
+      date: '2024-12-08',
+      verified: true,
+      helpful: 15
+    }
+  ])
   const addItem = useCartStore((state) => state.addItem)
 
   useEffect(() => {
@@ -170,6 +199,21 @@ export default function ProductDetailPage() {
     }
   }
 
+  const handleNewReview = (newReview: Omit<any, 'id' | 'date' | 'helpful'>) => {
+    const review = {
+      ...newReview,
+      id: Date.now().toString(),
+      date: new Date().toISOString().split('T')[0],
+      helpful: 0
+    }
+    setReviews(prev => [review, ...prev])
+  }
+
+  const averageRating = reviews.length > 0 
+    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length 
+    : 0
+  const totalReviews = reviews.length
+
   const handleAddToCart = () => {
     if (product) {
       addItem(product, quantity)
@@ -282,37 +326,10 @@ export default function ProductDetailPage() {
             <div className="mb-8">
               <ProductReviews 
                 productId={product.id}
-                reviews={[
-                  {
-                    id: '1',
-                    customerName: 'Sarah Johnson',
-                    rating: 5,
-                    comment: 'Excellent quality and fast delivery. Very satisfied with this purchase!',
-                    date: '2024-12-15',
-                    verified: true,
-                    helpful: 12
-                  },
-                  {
-                    id: '2',
-                    customerName: 'Mike Chen',
-                    rating: 4,
-                    comment: 'Good product overall, though delivery took a bit longer than expected.',
-                    date: '2024-12-10',
-                    verified: true,
-                    helpful: 8
-                  },
-                  {
-                    id: '3',
-                    customerName: 'Emma Wilson',
-                    rating: 5,
-                    comment: 'Amazing quality! Will definitely buy again.',
-                    date: '2024-12-08',
-                    verified: true,
-                    helpful: 15
-                  }
-                ]}
-                averageRating={4.7}
-                totalReviews={3}
+                reviews={reviews}
+                averageRating={averageRating}
+                totalReviews={totalReviews}
+                onNewReview={handleNewReview}
               />
             </div>
 

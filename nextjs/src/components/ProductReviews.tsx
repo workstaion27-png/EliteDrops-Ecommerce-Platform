@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Star, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { Star, ThumbsUp, ThumbsDown, X, Send } from 'lucide-react'
 
 interface Review {
   id: string
@@ -18,11 +18,18 @@ interface ProductReviewsProps {
   reviews: Review[]
   averageRating: number
   totalReviews: number
+  onNewReview?: (review: Omit<Review, 'id' | 'date' | 'helpful'>) => void
 }
 
-export default function ProductReviews({ productId, reviews, averageRating, totalReviews }: ProductReviewsProps) {
+export default function ProductReviews({ productId, reviews, averageRating, totalReviews, onNewReview }: ProductReviewsProps) {
   const [sortBy, setSortBy] = useState<'newest' | 'highest' | 'lowest' | 'helpful'>('newest')
   const [helpfulVotes, setHelpfulVotes] = useState<Record<string, boolean>>({})
+  const [showReviewModal, setShowReviewModal] = useState(false)
+  const [reviewForm, setReviewForm] = useState({
+    customerName: '',
+    rating: 5,
+    comment: ''
+  })
 
   const sortedReviews = [...reviews].sort((a, b) => {
     switch (sortBy) {
@@ -61,6 +68,33 @@ export default function ProductReviews({ productId, reviews, averageRating, tota
     
     setHelpfulVotes(prev => ({ ...prev, [reviewId]: true }))
     // Here you would update the helpful count in your backend
+  }
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Validate form
+    if (!reviewForm.customerName.trim() || !reviewForm.comment.trim()) {
+      alert('Please fill in all fields')
+      return
+    }
+
+    // Create new review
+    const newReview = {
+      customerName: reviewForm.customerName.trim(),
+      rating: reviewForm.rating,
+      comment: reviewForm.comment.trim(),
+      verified: true
+    }
+
+    // Call parent callback if provided
+    if (onNewReview) {
+      onNewReview(newReview)
+    }
+
+    // Reset form and close modal
+    setReviewForm({ customerName: '', rating: 5, comment: '' })
+    setShowReviewModal(false)
   }
 
   const getRatingDistribution = () => {
@@ -174,10 +208,102 @@ export default function ProductReviews({ productId, reviews, averageRating, tota
 
       {/* Write Review Button */}
       <div className="mt-8 text-center">
-        <button className="px-6 py-3 bg-luxury-gold text-white font-medium rounded-lg hover:bg-luxury-dark-gold transition-colors">
+        <button 
+          onClick={() => setShowReviewModal(true)}
+          className="px-6 py-3 bg-luxury-gold text-white font-medium rounded-lg hover:bg-luxury-dark-gold transition-colors"
+        >
           Write a Review
         </button>
       </div>
+
+      {/* Review Modal */}
+      {showReviewModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h3 className="text-xl font-bold text-gray-900">Write a Review</h3>
+              <button 
+                onClick={() => setShowReviewModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmitReview} className="p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  value={reviewForm.customerName}
+                  onChange={(e) => setReviewForm(prev => ({ ...prev, customerName: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luxury-gold focus:border-transparent"
+                  placeholder="Enter your name"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Rating
+                </label>
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewForm(prev => ({ ...prev, rating: star }))}
+                      className="p-1 hover:scale-110 transition-transform"
+                    >
+                      <Star
+                        className={`h-8 w-8 ${
+                          star <= reviewForm.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                  <span className="ml-2 text-sm text-gray-600">
+                    {reviewForm.rating} out of 5
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Your Review
+                </label>
+                <textarea
+                  value={reviewForm.comment}
+                  onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luxury-gold focus:border-transparent"
+                  placeholder="Share your thoughts about this product..."
+                  required
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowReviewModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-luxury-gold text-white font-medium rounded-lg hover:bg-luxury-dark-gold transition-colors flex items-center justify-center gap-2"
+                >
+                  <Send className="h-4 w-4" />
+                  Submit Review
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
