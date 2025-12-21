@@ -25,9 +25,9 @@ STORE_URL=https://luxuryhub-ecommerce.vercel.app
 STORE_CURRENCY=USD
 STORE_TAX_RATE=0.08
 
-# Payment Gateways (Optional - Add if needed)
-# PAYPAL_CLIENT_ID=your_paypal_client_id
-# PAYPAL_CLIENT_SECRET=your_paypal_client_secret
+# Payment Gateways
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=Afci_08L6xFO22HB8UKZh0TZ3gDhONQ7w6yy376gtR522RRNBPqifomIq8O8Z2wFfiCw1o-lZsT8ihMs
+PAYPAL_CLIENT_SECRET=EMpcrKTla8uJjMkzPy6iKSIF8RZ3XBJeQIYbT7mVIknu2JmHyEXWyYncLeoQqxf479-2-6Lui1_HeLOm
 # STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_key
 # STRIPE_SECRET_KEY=sk_test_your_stripe_secret
 
