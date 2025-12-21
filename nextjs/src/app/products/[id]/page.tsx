@@ -383,7 +383,7 @@ export default function ProductDetailPage() {
             <div className="border-t border-slate-200 pt-6 space-y-4">
               <div className="flex items-center gap-3 text-slate-600">
                 <Truck className="h-5 w-5 text-primary-600" />
-                <span>Free shipping on orders over $50</span>
+                <span>Free shipping 3-5 business days</span>
               </div>
               <div className="flex items-center gap-3 text-slate-600">
                 <Shield className="h-5 w-5 text-primary-600" />

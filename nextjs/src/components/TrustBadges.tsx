@@ -14,7 +14,7 @@ export default function TrustBadges() {
     {
       icon: Truck,
       title: "Free Shipping",
-      description: "On orders over $50 worldwide",
+      description: "Free worldwide shipping 3-5 business days",
       color: "text-blue-600"
     },
     {

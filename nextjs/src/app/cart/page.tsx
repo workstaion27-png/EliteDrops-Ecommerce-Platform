@@ -123,7 +123,7 @@ export default function CartPage() {
                 </div>
                 {shipping > 0 && (
                   <p className="text-xs text-slate-500">
-                    Free shipping on orders over $50
+                    Free shipping 3-5 business days
                   </p>
                 )}
                 <div className="border-t border-slate-200 pt-3 flex justify-between font-bold text-slate-900">
