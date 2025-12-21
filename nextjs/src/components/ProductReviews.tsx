@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Star, ThumbsUp, ThumbsDown, X, Send } from 'lucide-react'
 
 interface Review {
@@ -30,6 +30,11 @@ export default function ProductReviews({ productId, reviews, averageRating, tota
     rating: 5,
     comment: ''
   })
+
+  // Debug modal state
+  useEffect(() => {
+    console.log('Modal state changed:', showReviewModal)
+  }, [showReviewModal])
 
   const sortedReviews = [...reviews].sort((a, b) => {
     switch (sortBy) {
@@ -150,7 +155,7 @@ export default function ProductReviews({ productId, reviews, averageRating, tota
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as any)}
-          className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring-2 focus:ring-luxury-gold focus:border-transparent"
+          className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent"
         >
           <option value="newest">Newest first</option>
           <option value="highest">Highest rating</option>
@@ -209,8 +214,11 @@ export default function ProductReviews({ productId, reviews, averageRating, tota
       {/* Write Review Button */}
       <div className="mt-8 text-center">
         <button 
-          onClick={() => setShowReviewModal(true)}
-          className="px-6 py-3 bg-luxury-gold text-white font-medium rounded-lg hover:bg-luxury-dark-gold transition-colors"
+          onClick={() => {
+            console.log('Write Review button clicked')
+            setShowReviewModal(true)
+          }}
+          className="px-6 py-3 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 transition-colors"
         >
           Write a Review
         </button>
@@ -239,7 +247,7 @@ export default function ProductReviews({ productId, reviews, averageRating, tota
                   type="text"
                   value={reviewForm.customerName}
                   onChange={(e) => setReviewForm(prev => ({ ...prev, customerName: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luxury-gold focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   placeholder="Enter your name"
                   required
                 />
@@ -278,7 +286,7 @@ export default function ProductReviews({ productId, reviews, averageRating, tota
                   value={reviewForm.comment}
                   onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-luxury-gold focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   placeholder="Share your thoughts about this product..."
                   required
                 />
@@ -294,7 +302,7 @@ export default function ProductReviews({ productId, reviews, averageRating, tota
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-luxury-gold text-white font-medium rounded-lg hover:bg-luxury-dark-gold transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 bg-amber-500 text-white font-medium rounded-lg hover:bg-luxury-dark-gold transition-colors flex items-center justify-center gap-2"
                 >
                   <Send className="h-4 w-4" />
                   Submit Review

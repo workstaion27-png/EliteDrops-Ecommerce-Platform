@@ -18,6 +18,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
   const [added, setAdded] = useState(false)
+  const [isFavorited, setIsFavorited] = useState(false)
   const [reviews, setReviews] = useState([
     {
       id: '1',
@@ -214,6 +215,10 @@ export default function ProductDetailPage() {
     : 0
   const totalReviews = reviews.length
 
+  const handleFavoriteToggle = () => {
+    setIsFavorited(!isFavorited)
+  }
+
   const handleAddToCart = () => {
     if (product) {
       addItem(product, quantity)
@@ -369,8 +374,13 @@ export default function ProductDetailPage() {
                 <Gem className="h-5 w-5" />
                 {added ? 'Added to Cart!' : 'Add to Cart'}
               </button>
-              <button className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50">
-                <Heart className="h-5 w-5 text-slate-600" />
+              <button 
+                onClick={handleFavoriteToggle}
+                className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                <Heart className={`h-5 w-5 transition-colors ${
+                  isFavorited ? 'text-red-500 fill-current' : 'text-slate-600'
+                }`} />
               </button>
             </div>
 
