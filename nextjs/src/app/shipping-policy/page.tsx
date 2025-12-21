@@ -62,7 +62,7 @@ export default function ShippingPolicyPage() {
                   We partner with trusted logistics providers to ensure your orders are delivered safely and on time:
                 </p>
                 <ul className="list-disc pl-6 text-slate-600 space-y-2">
-                  <li><strong>Standard Shipping:</strong> 7-15 business days (most popular)</li>
+                  <li><strong>Standard Shipping:</strong> 3-5 business days (most popular)</li>
                   <li><strong>Express Shipping:</strong> 5-10 business days (available for select regions)</li>
                   <li><strong>Priority Shipping:</strong> 3-7 business days (premium service)</li>
                 </ul>
@@ -71,9 +71,9 @@ export default function ShippingPolicyPage() {
               <div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-3">Shipping Costs</h3>
                 <p className="text-slate-600 leading-relaxed">
-                  Shipping costs are calculated based on the destination, weight, and selected shipping method. 
-                  Free shipping is available on orders over $100 USD to most destinations. 
-                  Shipping costs will be displayed at checkout before payment confirmation.
+                  All shipping is completely free for all orders to most destinations worldwide. 
+                  No minimum order amount required. All shipping methods (Standard, Express, Priority) 
+                  are free for all our customers.
                 </p>
               </div>
 

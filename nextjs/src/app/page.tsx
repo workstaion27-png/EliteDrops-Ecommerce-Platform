@@ -91,7 +91,7 @@ export default function HomePage() {
   ]
 
   const features = [
-    { icon: Truck, title: 'Free Worldwide Shipping', description: 'Orders over $50 delivered free' },
+    { icon: Truck, title: 'Free Worldwide Shipping', description: 'All orders delivered free worldwide' },
     { icon: Shield, title: 'Secure & Protected', description: '256-bit SSL encryption' },
     { icon: CreditCard, title: '30-Day Returns', description: 'Hassle-free money back' },
     { icon: Headphones, title: '24/7 Premium Support', description: 'Expert customer service' },

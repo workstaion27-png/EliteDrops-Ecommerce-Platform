@@ -12,7 +12,7 @@ export default function Footer() {
               <span className="text-xl font-bold">LuxuryHub</span>
             </div>
             <p className="text-slate-400 text-sm">
-              Premium products at unbeatable prices. Fast worldwide shipping and excellent customer service.
+              Premium products at unbeatable prices. Free worldwide shipping (3-5 days) and excellent customer service.
             </p>
           </div>
 

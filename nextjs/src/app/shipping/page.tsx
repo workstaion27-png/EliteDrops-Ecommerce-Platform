@@ -33,7 +33,7 @@ export default function ShippingPage() {
                 <Truck className="h-6 w-6 text-blue-600" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Standard Shipping</h3>
-              <p className="text-2xl font-bold text-blue-600 mb-2">7-15</p>
+              <p className="text-2xl font-bold text-blue-600 mb-2">3-5</p>
               <p className="text-sm text-gray-600">business days</p>
               <p className="text-xs text-gray-500 mt-2">Most popular option</p>
             </div>
@@ -72,9 +72,9 @@ export default function ShippingPage() {
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Free Shipping</h3>
               <p className="text-gray-600">
-                We offer free shipping on orders over $100 USD to most destinations worldwide. 
-                Shipping costs are calculated based on destination, weight, and selected shipping method, 
-                and are displayed at checkout before payment confirmation.
+                We offer free shipping on all orders to most destinations worldwide. 
+                No minimum order amount required. All shipping methods are completely free 
+                for all our customers.
               </p>
             </div>
 
