@@ -67,8 +67,6 @@ export default function AccountPage() {
       } else {
         throw new Error('Please enter email and password')
       }
-        }
-      }
     } catch (err: any) {
       setError(err.message || 'Authentication failed')
     } finally {
