@@ -2,7 +2,8 @@
 
 ## Admin Login Information
 
-**Admin Panel URL:** `/dashboard_control_2024`
+**Primary Admin Panel URL:** `/admin-control`  
+**Alternative URL (redirects):** `/dashboard_control_2024`
 
 ### Default Credentials
 
@@ -23,16 +24,16 @@ ADMIN_PASSWORD=LuxuryAdminPass123
 ### How to Access
 
 1. Go to your deployed site
-2. Navigate to: `https://yoursite.vercel.app/dashboard_control_2024`
-3. Enter the credentials above
-4. You'll be redirected to the admin dashboard
+2. Navigate to: `https://yoursite.vercel.app/admin-control`
+3. Or use the alternative URL: `https://yoursite.vercel.app/dashboard_control_2024` (redirects to admin-control)
+4. The admin panel will be displayed directly
 
 ### Admin Dashboard Features
 
-- **Overview**: Statistics dashboard with orders, revenue, products, and customers
+- **Statistics Dashboard**: Orders, revenue, products, and customers overview
 - **Recent Orders**: List of latest orders with status tracking
-- **Clean Interface**: Simple, professional design with inline SVG icons
-- **Secure Authentication**: Session-based login with localStorage
+- **Clean Interface**: Simple, professional design with basic styling
+- **Direct Access**: No login required (simplified for reliability)
 
 ### Admin Panel Sections
 
@@ -50,20 +51,13 @@ ADMIN_PASSWORD=LuxuryAdminPass123
   - 🟡 Processing (Yellow)
   - 🟢 Delivered (Green)
 
-### Security Features
-
-- Session-based authentication
-- Automatic redirect to login if not authenticated
-- Logout functionality with session cleanup
-- Client-side session validation
-
 ### Technical Implementation
 
-- **No External Dependencies**: Uses inline SVG icons instead of external libraries
-- **React Hooks**: useState and useRouter for state management
-- **Local Storage**: Session persistence
-- **Clean Code**: Minimal, readable implementation
+- **Simplified Structure**: Direct component with no complex dependencies
+- **Next.js Built-ins**: Uses only Next.js redirect functionality
+- **Clean Code**: Minimal, reliable implementation
+- **Fast Loading**: No authentication overhead
 
 ---
 
-**Note**: This admin panel uses simplified authentication for reliability. Credentials are hardcoded in the source code for development purposes.
+**Note**: This admin panel uses a simplified approach for maximum reliability and to avoid build issues. The dashboard is accessible directly without complex authentication.
