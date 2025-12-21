@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { Shield, Truck, CreditCard, RotateCcw, Phone, Award } from 'lucide-react'
 
 export default function TrustBadges() {
@@ -51,10 +52,10 @@ export default function TrustBadges() {
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-          {badges.map((badge, index) => (
+          {badges.map((badge: { icon: any; title: string; description: string; color: string }, index) => (
             <div key={index} className="text-center group">
               <div className={`w-16 h-16 mx-auto mb-3 rounded-full bg-gray-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-200 ${badge.color}`}>
-                <badge.icon className="h-8 w-8" />
+                {React.createElement(badge.icon, { className: "h-8 w-8" })}
               </div>
               <h3 className="font-semibold text-gray-900 text-sm mb-1">{badge.title}</h3>
               <p className="text-xs text-gray-600 leading-tight">{badge.description}</p>
