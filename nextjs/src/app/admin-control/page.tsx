@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { User, Package, DollarSign, Users, LogOut } from 'lucide-react'
+import { User, DollarSign, Users, LogOut } from 'lucide-react'
 
 export default function AdminPanel() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)

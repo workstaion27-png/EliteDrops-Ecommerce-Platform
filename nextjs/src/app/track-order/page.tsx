@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Search, Package, Truck, CheckCircle, Clock, MapPin } from 'lucide-react'
+import { Search, Gem, Truck, CheckCircle, Clock, MapPin } from 'lucide-react'
 
 export default function TrackOrderPage() {
   const [trackingNumber, setTrackingNumber] = useState('')
@@ -36,7 +36,7 @@ export default function TrackOrderPage() {
         description: 'Your order is being prepared for shipment',
         timestamp: '2025-12-20 16:45',
         completed: true,
-        icon: Package
+        icon: Gem
       },
       {
         status: 'Shipped',
@@ -91,7 +91,7 @@ export default function TrackOrderPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="w-16 h-16 bg-luxury-gold rounded-full flex items-center justify-center mx-auto mb-4">
-            <Package className="h-8 w-8 text-white" />
+            <Gem className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Track Your Order</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">

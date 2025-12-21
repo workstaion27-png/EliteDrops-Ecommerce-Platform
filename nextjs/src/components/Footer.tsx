@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Package, Mail, Phone, MapPin } from 'lucide-react'
+import { Crown, Mail, Phone, MapPin } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <Package className="h-8 w-8 text-primary-400" />
+              <Crown className="h-8 w-8 text-primary-400" />
               <span className="text-xl font-bold">LuxuryHub</span>
             </div>
             <p className="text-slate-400 text-sm">

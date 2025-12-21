@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Package, Users, Award, Globe } from 'lucide-react'
+import { Crown, Users, Gem, Heart, Award, Globe } from 'lucide-react'
 
 export default function AboutPage() {
   return (
@@ -44,7 +44,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Package className="h-8 w-8 text-primary-600" />
+                <Crown className="h-8 w-8 text-primary-600" />
               </div>
               <h3 className="font-semibold text-slate-900 mb-2">Curated Luxury</h3>
               <p className="text-slate-600 text-sm">

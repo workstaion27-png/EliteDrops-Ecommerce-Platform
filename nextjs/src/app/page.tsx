@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Truck, Shield, CreditCard, Headphones } from 'lucide-react'
+import { ArrowRight, Globe2, Lock, Gem, MessageCircle } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
 import { supabase } from '@/lib/supabase'
 import { Product } from '@/types'
@@ -91,10 +91,10 @@ export default function HomePage() {
   ]
 
   const features = [
-    { icon: Truck, title: 'Free Worldwide Shipping', description: 'All orders delivered free worldwide' },
-    { icon: Shield, title: 'Secure & Protected', description: '256-bit SSL encryption' },
-    { icon: CreditCard, title: '30-Day Returns', description: 'Hassle-free money back' },
-    { icon: Headphones, title: '24/7 Premium Support', description: 'Expert customer service' },
+    { icon: Globe2, title: 'Free Worldwide Shipping', description: 'All orders delivered free worldwide' },
+    { icon: Lock, title: 'Secure & Protected', description: '256-bit SSL encryption' },
+    { icon: Gem, title: 'Premium Quality', description: 'Curated luxury products' },
+    { icon: MessageCircle, title: '24/7 Premium Support', description: 'Expert customer service' },
   ]
 
   // Special offer countdown - set to 7 days from now
@@ -157,15 +157,15 @@ export default function HomePage() {
               {/* Trust indicators */}
               <div className="flex items-center gap-6 mt-8 pt-8 border-t border-luxury-gold/20">
                 <div className="flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-luxury-gold" />
+                  <Lock className="h-5 w-5 text-luxury-gold" />
                   <span className="text-sm text-gray-300">SSL Secured</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Truck className="h-5 w-5 text-luxury-gold" />
+                  <Globe2 className="h-5 w-5 text-luxury-gold" />
                   <span className="text-sm text-gray-300">Free Shipping</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-luxury-gold" />
+                  <Gem className="h-5 w-5 text-luxury-gold" />
                   <span className="text-sm text-gray-300">Money Back</span>
                 </div>
               </div>

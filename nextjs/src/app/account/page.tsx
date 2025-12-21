@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { User, Package, LogOut, Settings, ShoppingBag } from 'lucide-react'
+import { User, Gem, LogOut, Settings, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 // Mock authentication for demo purposes
 import { useAuthStore } from '@/store/auth'
@@ -203,7 +203,7 @@ export default function AccountPage() {
           
           {orders.length === 0 ? (
             <div className="p-8 text-center">
-              <Package className="h-12 w-12 text-slate-300 mx-auto mb-3" />
+              <Gem className="h-12 w-12 text-slate-300 mx-auto mb-3" />
               <p className="text-slate-500">No orders yet</p>
               <Link href="/products" className="text-primary-600 hover:underline text-sm mt-2 inline-block">
                 Start Shopping

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, Search, User, Menu, X, Package } from 'lucide-react'
+import { ShoppingCart, Search, User, Menu, X, Crown } from 'lucide-react'
 import { useCartStore } from '@/store/cart'
 
 export default function Navbar() {
@@ -30,7 +30,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-gradient-to-br from-luxury-gold to-luxury-dark-gold rounded-xl flex items-center justify-center shadow-xl">
-              <Package className="h-7 w-7 text-white" />
+              <Crown className="h-7 w-7 text-white" />
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-bold text-luxury-black tracking-tight">LuxuryHub</span>
