@@ -45,7 +45,7 @@ export default function CheckoutPage() {
   }
 
   const createOrder = async () => {
-    // إنشاء طلب في قاعدة البيانات
+    // Create order in database
     const orderNumber = `EL${Date.now().toString().slice(-6)}`
     
     const orderData = {
@@ -82,7 +82,7 @@ export default function CheckoutPage() {
   const handlePayPalSuccess = async (details: any) => {
     setLoading(true)
     try {
-      // تحديث حالة الطلب إلى مدفوع
+      // Update order status to paid
       const orderNumber = details.purchase_units[0].custom_id
       
       await supabase
@@ -94,7 +94,7 @@ export default function CheckoutPage() {
         })
         .eq('order_number', orderNumber)
 
-      // إضافة عناصر الطلب
+      // Add order items
       const orderId = await supabase
         .from('orders')
         .select('id')
@@ -121,7 +121,7 @@ export default function CheckoutPage() {
       
     } catch (error) {
       console.error('Order confirmation error:', error)
-      setError('حدث خطأ في تأكيد الطلب')
+      setError('An error occurred while confirming the order')
     } finally {
       setLoading(false)
     }
@@ -129,7 +129,7 @@ export default function CheckoutPage() {
 
   const handlePayPalError = (error: any) => {
     console.error('PayPal error:', error)
-    setError('فشل في معالجة الدفع')
+    setError('Payment processing failed')
   }
 
   if (success) {
@@ -140,18 +140,18 @@ export default function CheckoutPage() {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Check className="h-8 w-8 text-green-600" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">تم تأكيد الطلب!</h1>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Order Confirmed!</h1>
             <p className="text-slate-600 mb-4">
-              رقم الطلب: <strong>{orderNumber}</strong>
+              Order Number: <strong>{orderNumber}</strong>
             </p>
             <p className="text-slate-600 mb-6">
-              شكراً لك على طلبك! سيتم إرسال تأكيد بالتفاصيل إلى بريدك الإلكتروني.
+              Thank you for your order! A confirmation with details will be sent to your email.
             </p>
             <Link 
               href="/products"
               className="inline-flex items-center px-6 py-3 bg-sky-600 text-white font-semibold rounded-lg hover:bg-sky-700 transition-colors"
             >
-              مواصلة التسوق
+              Continue Shopping
             </Link>
           </div>
         </div>
@@ -165,13 +165,13 @@ export default function CheckoutPage() {
         <div className="max-w-2xl mx-auto px-4 py-16">
           <div className="bg-white rounded-xl p-8 text-center">
             <ShoppingBag className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">سلة التسوق فارغة</h1>
-            <p className="text-slate-600 mb-6">أضف بعض المنتجات إلى سلة التسوق أولاً</p>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Cart is Empty</h1>
+            <p className="text-slate-600 mb-6">Add some products to your cart first</p>
             <Link 
               href="/products"
               className="inline-flex items-center px-6 py-3 bg-sky-600 text-white font-semibold rounded-lg hover:bg-sky-700 transition-colors"
             >
-              تصفح المنتجات
+              Browse Products
             </Link>
           </div>
         </div>
@@ -184,18 +184,18 @@ export default function CheckoutPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Link href="/cart" className="inline-flex items-center text-slate-600 hover:text-sky-600 mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          العودة إلى السلة
+          Back to Cart
         </Link>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* معلومات الطلب */}
+          {/* Order Information */}
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-8">معلومات الشحن</h1>
+            <h1 className="text-3xl font-bold text-slate-900 mb-8">Shipping Information</h1>
             
             <form className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  البريد الإلكتروني *
+                  Email Address *
                 </label>
                 <input
                   type="email"
@@ -211,7 +211,7 @@ export default function CheckoutPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    الاسم الأول *
+                    First Name *
                   </label>
                   <input
                     type="text"
@@ -220,12 +220,12 @@ export default function CheckoutPage() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                    placeholder="أحمد"
+                    placeholder="John"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    الاسم الأخير *
+                    Last Name *
                   </label>
                   <input
                     type="text"
@@ -234,14 +234,14 @@ export default function CheckoutPage() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                    placeholder="محمد"
+                    placeholder="Doe"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  رقم الهاتف
+                  Phone Number
                 </label>
                 <input
                   type="tel"
@@ -255,7 +255,7 @@ export default function CheckoutPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  العنوان *
+                  Address *
                 </label>
                 <input
                   type="text"
@@ -264,14 +264,14 @@ export default function CheckoutPage() {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                  placeholder="123 شارع رئيسي"
+                  placeholder="123 Main Street"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    المدينة *
+                    City *
                   </label>
                   <input
                     type="text"
@@ -280,12 +280,12 @@ export default function CheckoutPage() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                    placeholder="القاهرة"
+                    placeholder="New York"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    الولاية/المحافظة *
+                    State/Province *
                   </label>
                   <input
                     type="text"
@@ -294,7 +294,7 @@ export default function CheckoutPage() {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
-                    placeholder="القاهرة"
+                    placeholder="New York"
                   />
                 </div>
               </div>
@@ -302,7 +302,7 @@ export default function CheckoutPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    الرمز البريدي *
+                    Zip Code *
                   </label>
                   <input
                     type="text"
@@ -316,7 +316,7 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    الدولة *
+                    Country *
                   </label>
                   <select
                     name="country"
@@ -325,33 +325,33 @@ export default function CheckoutPage() {
                     required
                     className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent"
                   >
-                    <option value="United States">الولايات المتحدة</option>
-                    <option value="Canada">كندا</option>
-                    <option value="United Kingdom">المملكة المتحدة</option>
-                    <option value="Germany">ألمانيا</option>
-                    <option value="France">فرنسا</option>
-                    <option value="Spain">إسبانيا</option>
-                    <option value="Italy">إيطاليا</option>
-                    <option value="Netherlands">هولندا</option>
-                    <option value="Australia">أستراليا</option>
-                    <option value="Japan">اليابان</option>
-                    <option value="Saudi Arabia">المملكة العربية السعودية</option>
-                    <option value="United Arab Emirates">الإمارات العربية المتحدة</option>
-                    <option value="Egypt">مصر</option>
-                    <option value="Jordan">الأردن</option>
-                    <option value="Lebanon">لبنان</option>
-                    <option value="Morocco">المغرب</option>
-                    <option value="Tunisia">تونس</option>
+                    <option value="United States">United States</option>
+                    <option value="Canada">Canada</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Germany">Germany</option>
+                    <option value="France">France</option>
+                    <option value="Spain">Spain</option>
+                    <option value="Italy">Italy</option>
+                    <option value="Netherlands">Netherlands</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Japan">Japan</option>
+                    <option value="Saudi Arabia">Saudi Arabia</option>
+                    <option value="United Arab Emirates">United Arab Emirates</option>
+                    <option value="Egypt">Egypt</option>
+                    <option value="Jordan">Jordan</option>
+                    <option value="Lebanon">Lebanon</option>
+                    <option value="Morocco">Morocco</option>
+                    <option value="Tunisia">Tunisia</option>
                   </select>
                 </div>
               </div>
             </form>
           </div>
 
-          {/* ملخص الطلب والدفع */}
+          {/* Order Summary and Payment */}
           <div>
             <div className="bg-white rounded-xl p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">ملخص الطلب</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-6">Order Summary</h2>
               
               {/* المنتجات */}
               <div className="space-y-4 mb-6">
@@ -366,7 +366,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-medium text-slate-900">{item.product.name}</h3>
-                      <p className="text-sm text-slate-500">الكمية: {item.quantity}</p>
+                      <p className="text-sm text-slate-500">Quantity: {item.quantity}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium text-slate-900">
@@ -377,41 +377,41 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              {/* المجاميع */}
+              {/* Totals */}
               <div className="space-y-3 mb-6 pt-6 border-t border-slate-200">
                 <div className="flex justify-between">
-                  <span className="text-slate-600">المجموع الفرعي</span>
+                  <span className="text-slate-600">Subtotal</span>
                   <span className="font-medium">${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">الشحن</span>
+                  <span className="text-slate-600">Shipping</span>
                   <span className="font-medium">
-                    {shipping === 0 ? 'مجاني' : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">الضريبة</span>
+                  <span className="text-slate-600">Tax</span>
                   <span className="font-medium">${tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold pt-3 border-t border-slate-200">
-                  <span>المجموع الكلي</span>
+                  <span>Total</span>
                   <span>${total.toFixed(2)}</span>
                 </div>
               </div>
 
-              {/* معلومات إضافية */}
+              {/* Additional Information */}
               <div className="space-y-3 mb-6 text-sm text-slate-600">
                 <div className="flex items-center gap-2">
                   <Truck className="h-4 w-4 text-sky-600" />
-                  <span>شحن مجاني 3-5 أيام عمل</span>
+                  <span>Free shipping 3-5 business days</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Shield className="h-4 w-4 text-sky-600" />
-                  <span>دفع آمن ومحمي</span>
+                  <span>Secure payment protected</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4 text-sky-600" />
-                  <span>ادفع بالفيزا، الماستر كارد، أو PayPal</span>
+                  <span>Pay with Visa, MasterCard, or PayPal</span>
                 </div>
               </div>
 
@@ -427,7 +427,7 @@ export default function CheckoutPage() {
                   createOrder={async () => {
                     if (!formData.email || !formData.firstName || !formData.lastName || 
                         !formData.address || !formData.city || !formData.state || !formData.zip) {
-                      setError('يرجى ملء جميع الحقول المطلوبة')
+                      setError('Please fill in all required fields')
                       return ''
                     }
                     
@@ -436,7 +436,7 @@ export default function CheckoutPage() {
                       return orderNumber
                     } catch (error) {
                       console.error('Error creating order:', error)
-                      setError('فشل في إنشاء الطلب')
+                      setError('Failed to create order')
                       return ''
                     }
                   }}
@@ -448,7 +448,7 @@ export default function CheckoutPage() {
                   }}
                   onError={handlePayPalError}
                   onCancel={() => {
-                    setError('تم إلغاء عملية الدفع')
+                    setError('Payment was cancelled')
                   }}
                 />
               </PayPalScriptProvider>
