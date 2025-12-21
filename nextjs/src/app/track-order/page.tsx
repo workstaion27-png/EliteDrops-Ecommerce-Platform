@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Search, Package, Truck, CheckCircle, Clock, MapPin } from 'lucide-react'
 
 export default function TrackOrderPage() {
@@ -185,7 +185,7 @@ export default function TrackOrderPage() {
                             ? 'bg-luxury-gold text-white animate-pulse'
                             : 'bg-gray-200 text-gray-400'
                       }`}>
-                        <step.icon className="h-6 w-6" />
+                        {React.createElement(step.icon, { className: "h-6 w-6" })}
                       </div>
                       
                       {/* Step Content */}
