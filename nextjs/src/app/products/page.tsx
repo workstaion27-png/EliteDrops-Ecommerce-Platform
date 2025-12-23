@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Filter, ChevronDown } from 'lucide-react'
+import { Search, Filter, ChevronDown, RefreshCw, AlertCircle } from 'lucide-react'
 import ProductCard from '@/components/ProductCard'
 import { supabase } from '@/lib/supabase'
 import { Product } from '@/types'
@@ -9,159 +9,84 @@ import { Product } from '@/types'
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [sortBy, setSortBy] = useState('newest')
+  const [allProducts, setAllProducts] = useState<Product[]>([])
 
   const categories = ['All', 'Electronics', 'Accessories', 'Home', 'Fitness']
 
   useEffect(() => {
     fetchProducts()
-  }, [selectedCategory, sortBy])
+  }, [])
 
   const fetchProducts = async () => {
     setLoading(true)
+    setError(null)
     try {
-      // Mock data for demonstration
-      const mockProducts: Product[] = [
-        {
-          id: '1',
-          name: 'Luxury Wireless Headphones',
-          description: 'Premium noise-cancelling wireless headphones with exceptional sound quality and comfort.',
-          price: 299.99,
-          compare_price: 399.99,
-          images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400'],
-          category: 'Electronics',
-          inventory_count: 25,
-          is_active: true,
-          created_at: '2024-12-01T10:00:00Z',
-          updated_at: '2024-12-01T10:00:00Z'
-        },
-        {
-          id: '2',
-          name: 'Elegant Smart Watch',
-          description: 'Sophisticated smartwatch with health monitoring and elegant design.',
-          price: 449.99,
-          compare_price: 599.99,
-          images: ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'],
-          category: 'Electronics',
-          inventory_count: 18,
-          is_active: true,
-          created_at: '2024-12-02T10:00:00Z',
-          updated_at: '2024-12-02T10:00:00Z'
-        },
-        {
-          id: '3',
-          name: 'Premium Leather Wallet',
-          description: 'Handcrafted genuine leather wallet with multiple card slots and RFID protection.',
-          price: 89.99,
-          compare_price: 129.99,
-          images: ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400'],
-          category: 'Accessories',
-          inventory_count: 32,
-          is_active: true,
-          created_at: '2024-12-03T10:00:00Z',
-          updated_at: '2024-12-03T10:00:00Z'
-        },
-        {
-          id: '4',
-          name: 'Luxury Home Fragrance',
-          description: 'Premium scented candles with long-lasting fragrance and elegant packaging.',
-          price: 45.99,
-          compare_price: 65.99,
-          images: ['https://images.unsplash.com/photo-1602874801000-b9263cfe1001?w=400'],
-          category: 'Home',
-          inventory_count: 41,
-          is_active: true,
-          created_at: '2024-12-04T10:00:00Z',
-          updated_at: '2024-12-04T10:00:00Z'
-        },
-        {
-          id: '5',
-          name: 'Premium Yoga Mat',
-          description: 'Eco-friendly premium yoga mat with superior grip and cushioning.',
-          price: 79.99,
-          compare_price: 99.99,
-          images: ['https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400'],
-          category: 'Fitness',
-          inventory_count: 28,
-          is_active: true,
-          created_at: '2024-12-05T10:00:00Z',
-          updated_at: '2024-12-05T10:00:00Z'
-        },
-        {
-          id: '6',
-          name: 'Wireless Phone Charger',
-          description: 'Fast wireless charging pad compatible with all Qi-enabled devices.',
-          price: 34.99,
-          compare_price: 49.99,
-          images: ['https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400'],
-          category: 'Electronics',
-          inventory_count: 55,
-          is_active: true,
-          created_at: '2024-12-06T10:00:00Z',
-          updated_at: '2024-12-06T10:00:00Z'
-        },
-        {
-          id: '7',
-          name: 'Designer Sunglasses',
-          description: 'UV400 protection designer sunglasses with premium frames and polarized lenses.',
-          price: 189.99,
-          compare_price: 249.99,
-          images: ['https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400'],
-          category: 'Accessories',
-          inventory_count: 15,
-          is_active: true,
-          created_at: '2024-12-07T10:00:00Z',
-          updated_at: '2024-12-07T10:00:00Z'
-        },
-        {
-          id: '8',
-          name: 'Premium Coffee Grinder',
-          description: 'Precision coffee grinder with multiple grind settings for perfect brewing.',
-          price: 159.99,
-          compare_price: 199.99,
-          images: ['https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400'],
-          category: 'Home',
-          inventory_count: 22,
-          is_active: true,
-          created_at: '2024-12-08T10:00:00Z',
-          updated_at: '2024-12-08T10:00:00Z'
-        }
-      ]
-      
-      let products = mockProducts
+      // Fetch products from Supabase database
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
 
-      if (selectedCategory && selectedCategory !== 'All') {
-        products = products.filter(product => product.category === selectedCategory)
+      if (error) {
+        console.error('Supabase error:', error)
+        setError('Failed to load products from database')
+        // Fallback to empty array if database fetch fails
+        setProducts([])
+        setAllProducts([])
+      } else {
+        setProducts(data || [])
+        setAllProducts(data || [])
       }
-
-      switch (sortBy) {
-        case 'price-low':
-          products = products.sort((a, b) => a.price - b.price)
-          break
-        case 'price-high':
-          products = products.sort((a, b) => b.price - a.price)
-          break
-        case 'name':
-          products = products.sort((a, b) => a.name.localeCompare(b.name))
-          break
-        default:
-          products = products.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      }
-
-      setProducts(products)
-    } catch (error) {
-      console.error('Error fetching products:', error)
+    } catch (err) {
+      console.error('Error fetching products:', err)
+      setError('An unexpected error occurred')
+      setProducts([])
+      setAllProducts([])
     } finally {
       setLoading(false)
     }
   }
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Filter and sort products locally
+  useEffect(() => {
+    let filtered = [...allProducts]
+
+    // Filter by category
+    if (selectedCategory && selectedCategory !== 'All') {
+      filtered = filtered.filter(product => product.category === selectedCategory)
+    }
+
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+
+    // Sort
+    switch (sortBy) {
+      case 'price-low':
+        filtered = filtered.sort((a, b) => a.price - b.price)
+        break
+      case 'price-high':
+        filtered = filtered.sort((a, b) => b.price - a.price)
+        break
+      case 'name':
+        filtered = filtered.sort((a, b) => a.name.localeCompare(b.name))
+        break
+      default:
+        // newest - already sorted by database
+        break
+    }
+
+    setProducts(filtered)
+  }, [allProducts, selectedCategory, sortBy, searchQuery])
 
   return (
     <div className="pt-16 min-h-screen bg-slate-50">
@@ -217,25 +142,66 @@ export default function ProductsPage() {
           </div>
         </div>
 
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-red-600" />
+              <p className="text-red-700">{error}</p>
+              <button
+                onClick={fetchProducts}
+                className="ml-auto flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Retry
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Results count */}
         <p className="text-sm text-slate-600 mb-6">
-          Showing {filteredProducts.length} products
+          {loading ? 'Loading products...' : `${products.length} products found`}
         </p>
 
         {/* Products Grid */}
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[...Array(12)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl animate-pulse aspect-[3/4]" />
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-white rounded-xl animate-pulse">
+                <div className="aspect-square bg-slate-200 rounded-t-xl" />
+                <div className="p-4 space-y-3">
+                  <div className="h-4 bg-slate-200 rounded w-3/4" />
+                  <div className="h-4 bg-slate-200 rounded w-1/2" />
+                  <div className="h-5 bg-slate-200 rounded w-1/3 mt-4" />
+                </div>
+              </div>
             ))}
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : products.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-slate-500 text-lg">No products found matching your criteria.</p>
+            <div className="bg-slate-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <Search className="h-8 w-8 text-slate-400" />
+            </div>
+            <p className="text-slate-500 text-lg mb-2">No products found</p>
+            <p className="text-slate-400 text-sm">
+              {allProducts.length === 0 
+                ? 'The database is empty. Add products to get started.'
+                : 'Try adjusting your search or filters.'}
+            </p>
+            {allProducts.length === 0 && (
+              <button
+                onClick={fetchProducts}
+                className="mt-4 flex items-center gap-2 mx-auto px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Refresh
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
+            {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
