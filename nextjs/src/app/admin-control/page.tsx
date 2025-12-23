@@ -44,7 +44,6 @@ export default function AdminPanel() {
     totalProducts: 0,
     totalCustomers: 0
   })
-  const [loading, setLoading] = useState(true)
 
   const router = useRouter()
 
