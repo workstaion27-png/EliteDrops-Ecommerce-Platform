@@ -64,8 +64,8 @@ async function handleSyncOrderStatus(orderId: string) {
 async function handleCancelOrder(orderId: string) {
   try {
     // Get order details
-    const { data: order } = await StoreServices.getOrders({ limit: 1, offset: 0 })
-    const targetOrder = order?.find(o => o.id === orderId)
+    const orders = await StoreServices.getOrders({ limit: 1, offset: 0 })
+    const targetOrder = orders.find(o => o.id === orderId)
     
     if (!targetOrder?.cj_order_id) {
       throw new Error('Order not found or not linked to CJdropshipping')
