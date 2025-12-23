@@ -8,9 +8,9 @@ export async function GET(request: NextRequest) {
     const filters = {
       status: searchParams.get('status') as any,
       payment_status: searchParams.get('payment_status') as any,
-      customer_id: searchParams.get('customer_id'),
-      date_from: searchParams.get('date_from'),
-      date_to: searchParams.get('date_to'),
+      customer_id: searchParams.get('customer_id') || undefined,
+      date_from: searchParams.get('date_from') || undefined,
+      date_to: searchParams.get('date_to') || undefined,
       limit: parseInt(searchParams.get('limit') || '50'),
       offset: parseInt(searchParams.get('offset') || '0')
     }
