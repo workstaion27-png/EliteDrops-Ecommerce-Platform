@@ -1,0 +1,29 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "@supabase_url",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase_anon_key",
+    "NEXT_PUBLIC_PAYPAL_CLIENT_ID": "@paypal_client_id",
+    "CJ_APP_KEY": "@cj_app_key",
+    "CJ_SECRET_KEY": "@cj_secret_key",
+    "CJ_PARTNER_ID": "@cj_partner_id",
+    "STRIPE_PUBLISHABLE_KEY": "@stripe_publishable",
+    "STRIPE_SECRET_KEY": "@stripe_secret",
+    "SHIPPING_API_KEY": "@shipping_api",
+    "SMTP_HOST": "@smtp_host",
+    "SMTP_PORT": "@smtp_port",
+    "SMTP_USER": "@smtp_user",
+    "SMTP_PASS": "@smtp_password",
+    "EMAIL_FROM": "@email_from",
+    "JWT_SECRET": "@jwt_secret",
+    "ENCRYPTION_KEY": "@encryption_key",
+    "ADMIN_EMAIL": "@admin_email",
+    "ADMIN_PASSWORD": "@admin_password",
+    "STORE_NAME": "@store_name",
+    "STORE_URL": "@store_url",
+    "STORE_CURRENCY": "@store_currency",
+    "STORE_TAX_RATE": "@store_tax_rate"
+  }
+}
