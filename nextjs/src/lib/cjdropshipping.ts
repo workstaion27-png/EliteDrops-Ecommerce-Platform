@@ -352,6 +352,19 @@ class CJDropshippingAPI {
       return false;
     }
   }
+
+  // Verify webhook signature (placeholder - CJ doesn't require webhook verification)
+  verifyWebhook(payload: string, signature: string): boolean {
+    // CJ Dropshipping webhooks don't require signature verification
+    // This is a placeholder that always returns true
+    // In production, you may want to add actual verification logic
+    if (!signature) {
+      console.warn('No webhook signature provided');
+      // Return true for now - CJ doesn't provide webhooks with signatures
+      // Add actual verification if CJ adds webhook signing in the future
+    }
+    return true;
+  }
 }
 
 export const cjAPI = new CJDropshippingAPI();
