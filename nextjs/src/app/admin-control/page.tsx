@@ -31,13 +31,40 @@ import {
 import OrderManagement from '@/components/admin/OrderManagement'
 import CJDropshippingIntegration from '@/components/admin/CJDropshippingIntegration'
 
+// TypeScript interfaces for admin panel
+interface Order {
+  id: string
+  customer: string
+  total: number
+  status: string
+  date?: string
+}
+
+interface Product {
+  id: string
+  name: string
+  category: string
+  price: number
+  stock: number
+  status: string
+}
+
+interface Customer {
+  id: string
+  name: string
+  email: string
+  orders: number
+  total: number
+  joinDate: string
+}
+
 export default function AdminPanel() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('dashboard')
-  const [orders, setOrders] = useState([])
-  const [products, setProducts] = useState([])
-  const [customers, setCustomers] = useState([])
+  const [orders, setOrders] = useState<Order[]>([])
+  const [products, setProducts] = useState<Product[]>([])
+  const [customers, setCustomers] = useState<Customer[]>([])
   const [dashboardStats, setDashboardStats] = useState({
     totalOrders: 0,
     totalRevenue: 0,
