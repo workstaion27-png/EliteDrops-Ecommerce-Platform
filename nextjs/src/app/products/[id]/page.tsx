@@ -11,6 +11,17 @@ import ProductReviews from '@/components/ProductReviews'
 import CountdownTimer from '@/components/CountdownTimer'
 import TrustBadges from '@/components/TrustBadges'
 
+// Define review type
+interface Review {
+  id: string
+  customerName: string
+  rating: number
+  comment: string
+  date: string
+  verified: boolean
+  helpful: number
+}
+
 export default function ProductDetailPage() {
   const params = useParams()
   const [product, setProduct] = useState<Product | null>(null)
@@ -19,7 +30,7 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0)
   const [added, setAdded] = useState(false)
   const [isFavorited, setIsFavorited] = useState(false)
-  const [reviews, setReviews] = useState([
+  const [reviews, setReviews] = useState<Review[]>([
     {
       id: '1',
       customerName: 'Sarah Johnson',
@@ -200,8 +211,8 @@ export default function ProductDetailPage() {
     }
   }
 
-  const handleNewReview = (newReview: Omit<any, 'id' | 'date' | 'helpful'>) => {
-    const review = {
+  const handleNewReview = (newReview: { customerName: string; rating: number; comment: string; verified: boolean }) => {
+    const review: Review = {
       ...newReview,
       id: Date.now().toString(),
       date: new Date().toISOString().split('T')[0],
