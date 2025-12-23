@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     };
 
     // This would need to be implemented in StoreServices
-    const customers = []; // Placeholder - implement getCustomers in StoreServices
+    const customers: any[] = []; // Placeholder - implement getCustomers in StoreServices
     
     return NextResponse.json({
       success: true,
