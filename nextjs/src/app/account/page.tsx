@@ -149,15 +149,6 @@ export default function AccountPage() {
                 {isLogin ? 'Sign Up' : 'Sign In'}
               </button>
             </p>
-
-            <div className="mt-6 pt-6 border-t border-slate-200">
-              <Link
-                href="/admin"
-                className="block text-center text-sm text-slate-500 hover:text-primary-600"
-              >
-                Admin Login
-              </Link>
-            </div>
           </div>
         </div>
       </div>
