@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@supabase/supabase-js'
 import { 
   LogOut, 
   Package, 
@@ -30,10 +30,17 @@ import {
   ShoppingBag,
   X,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  RefreshCw,
+  Globe
 } from 'lucide-react'
 import OrderManagement from '@/components/admin/OrderManagement'
 import CJDropshippingIntegration from '@/components/admin/CJDropshippingIntegration'
+
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // TypeScript interfaces for admin panel
 interface Order {
@@ -75,6 +82,15 @@ interface NewProductData {
   is_active: boolean
 }
 
+interface CJSearchProduct {
+  id: string
+  name: string
+  price: number
+  image: string
+  category: string
+  stock: number
+}
+
 export default function AdminPanel() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -102,9 +118,17 @@ export default function AdminPanel() {
     is_active: true
   })
   const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  
+  // CJ Search States
+  const [cjSearchMode, setCjSearchMode] = useState(false)
+  const [cjSearchQuery, setCjSearchQuery] = useState('')
+  const [cjSearchResults, setCjSearchResults] = useState<CJSearchProduct[]>([])
+  const [cjLoading, setCjLoading] = useState(false)
+  const [cjPage, setCjPage] = useState(1)
+  const [cjImporting, setCjImporting] = useState<{ [key: string]: string }>({})
+  const [cjError, setCjError] = useState<string | null>(null)
 
   const router = useRouter()
-  const supabase = createClientComponentClient()
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -246,6 +270,105 @@ export default function AdminPanel() {
 
   const openAddProductModal = () => {
     setIsAddProductModalOpen(true)
+  }
+
+  // CJ Search Functions
+  const handleCJSearch = async () => {
+    if (!cjSearchQuery.trim()) return
+    
+    setCjLoading(true)
+    setCjError(null)
+    setCjSearchResults([])
+    setCjPage(1)
+
+    try {
+      const response = await fetch(`/api/cj/search?query=${encodeURIComponent(cjSearchQuery)}&page=1&limit=20`)
+      const data = await response.json()
+
+      if (data.success) {
+        setCjSearchResults(data.data || [])
+      } else {
+        setCjError(data.error || 'Failed to search products')
+      }
+    } catch (error: any) {
+      setCjError(error.message || 'Network error occurred')
+    } finally {
+      setCjLoading(false)
+    }
+  }
+
+  const handleCJImport = async (product: CJSearchProduct) => {
+    setCjImporting(prev => ({ ...prev, [product.id]: 'loading' }))
+
+    try {
+      const response = await fetch('/api/cj/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cjProductId: product.id,
+          name: product.name,
+          category: product.category,
+          price: product.price,
+          stock: product.stock,
+          image_url: product.image
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setCjImporting(prev => ({ ...prev, [product.id]: 'success' }))
+        setSubmitMessage({ type: 'success', text: `تم استيراد "${product.name}" بنجاح!` })
+        loadDashboardData()
+        
+        // Close modal after success
+        setTimeout(() => {
+          setIsAddProductModalOpen(false)
+          setSubmitMessage(null)
+          setCjSearchMode(false)
+          setCjSearchResults([])
+          setCjSearchQuery('')
+        }, 2000)
+      } else {
+        setCjImporting(prev => ({ ...prev, [product.id]: 'error' }))
+        if (data.error === 'Product already imported') {
+          setSubmitMessage({ type: 'error', text: 'هذا المنتج تم استيراده مسبقاً!' })
+        } else {
+          setSubmitMessage({ type: 'error', text: data.error || 'فشل في استيراد المنتج' })
+        }
+      }
+    } catch (error: any) {
+      setCjImporting(prev => ({ ...prev, [product.id]: 'error' }))
+      setSubmitMessage({ type: 'error', text: 'حدث خطأ في الاتصال' })
+    }
+  }
+
+  const switchToCJSearch = () => {
+    setCjSearchMode(true)
+    setSubmitMessage(null)
+  }
+
+  const switchToManualAdd = () => {
+    setCjSearchMode(false)
+    setSubmitMessage(null)
+  }
+
+  const closeModal = () => {
+    setIsAddProductModalOpen(false)
+    setSubmitMessage(null)
+    setCjSearchMode(false)
+    setCjSearchResults([])
+    setCjSearchQuery('')
+    setCjError(null)
+    setNewProduct({
+      name: '',
+      description: '',
+      category: '',
+      price: 0,
+      stock: 0,
+      image_url: '',
+      is_active: true
+    })
   }
 
   const getStatusColor = (status: string) => {
@@ -775,10 +898,30 @@ export default function AdminPanel() {
           <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <Plus className="h-5 w-5 text-amber-600" />
-                إضافة منتج جديد
-              </h3>
+              <div className="flex items-center gap-3">
+                {!cjSearchMode && (
+                  <button
+                    onClick={switchToCJSearch}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
+                  >
+                    <Globe className="h-4 w-4" />
+                    Import from CJ
+                  </button>
+                )}
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  {cjSearchMode ? (
+                    <>
+                      <Globe className="h-5 w-5 text-blue-600" />
+                      Import from CJ Dropshipping
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-5 w-5 text-amber-600" />
+                      Add New Product
+                    </>
+                  )}
+                </h3>
+              </div>
               <button
                 onClick={closeModal}
                 className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
@@ -787,8 +930,198 @@ export default function AdminPanel() {
               </button>
             </div>
 
-            {/* Form */}
-            <form onSubmit={handleAddProduct} className="p-6 space-y-6">
+            {/* Message */}
+            {submitMessage && (
+              <div className={`mx-6 mt-6 p-4 rounded-lg ${
+                submitMessage.type === 'success' 
+                  ? 'bg-green-50 text-green-800 border border-green-200' 
+                  : 'bg-red-50 text-red-800 border border-red-200'
+              }`}>
+                <div className="flex items-center gap-2">
+                  {submitMessage.type === 'success' ? (
+                    <CheckCircle className="h-5 w-5" />
+                  ) : (
+                    <AlertCircle className="h-5 w-5" />
+                  )}
+                  {submitMessage.text}
+                </div>
+              </div>
+            )}
+
+            {/* CJ Search Mode */}
+            {cjSearchMode && (
+              <div className="p-6">
+                {/* Search Bar */}
+                <div className="flex gap-3 mb-6">
+                  <div className="flex-1 relative">
+                    <Search className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="text"
+                      value={cjSearchQuery}
+                      onChange={(e) => setCjSearchQuery(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleCJSearch()}
+                      placeholder="Search products (e.g., watch, shirt, phone case)..."
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                    />
+                  </div>
+                  <button
+                    onClick={handleCJSearch}
+                    disabled={cjLoading || !cjSearchQuery.trim()}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {cjLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        Searching...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="h-5 w-5" />
+                        Search
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Error Message */}
+                {cjError && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-red-700">
+                      <AlertCircle className="h-5 w-5" />
+                      {cjError}
+                    </div>
+                  </div>
+                )}
+
+                {/* Loading Skeleton */}
+                {cjLoading && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="bg-gray-50 rounded-lg p-4 animate-pulse">
+                        <div className="h-40 bg-gray-200 rounded-lg mb-4"></div>
+                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Empty State */}
+                {!cjLoading && cjSearchResults.length === 0 && !cjError && (
+                  <div className="text-center py-12">
+                    <Globe className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">Search CJ Dropshipping Products</h4>
+                    <p className="text-gray-500">Enter a search keyword to find products from CJ catalog</p>
+                  </div>
+                )}
+
+                {/* Results Grid */}
+                {!cjLoading && cjSearchResults.length > 0 && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {cjSearchResults.map((product) => (
+                        <div 
+                          key={product.id} 
+                          className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                        >
+                          <div className="aspect-square bg-gray-100 relative">
+                            {product.image ? (
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement
+                                  target.style.display = 'none'
+                                  target.parentElement!.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400"><Package class="h-12 w-12"/></div>'
+                                }}
+                              />
+                            ) : (
+                              <div className="flex items-center justify-center h-full text-gray-400">
+                                <Package className="h-12 w-12" />
+                              </div>
+                            )}
+                            <div className="absolute top-2 right-2">
+                              <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                                ${product.price}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <h4 className="font-medium text-gray-900 text-sm line-clamp-2 mb-2">
+                              {product.name}
+                            </h4>
+                            <p className="text-xs text-gray-500 mb-3">
+                              Category: {product.category || 'N/A'}
+                            </p>
+                            <p className="text-xs text-gray-500 mb-3">
+                              Stock: {product.stock > 0 ? `${product.stock} units` : 'Out of stock'}
+                            </p>
+                            <button
+                              onClick={() => handleCJImport(product)}
+                              disabled={cjImporting[product.id] === 'loading' || cjImporting[product.id] === 'success'}
+                              className={`w-full py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                                cjImporting[product.id] === 'success'
+                                  ? 'bg-green-100 text-green-700'
+                                  : cjImporting[product.id] === 'error'
+                                  ? 'bg-red-100 text-red-700'
+                                  : 'bg-amber-600 text-white hover:bg-amber-700'
+                              }`}
+                            >
+                              {cjImporting[product.id] === 'loading' && (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                              )}
+                              {cjImporting[product.id] === 'success' && (
+                                <>
+                                  <CheckCircle className="h-4 w-4" />
+                                  Imported
+                                </>
+                              )}
+                              {cjImporting[product.id] === 'error' && (
+                                <>
+                                  <XCircle className="h-4 w-4" />
+                                  Error - Try Again
+                                </>
+                              )}
+                              {!cjImporting[product.id] && (
+                                <>
+                                  <Upload className="h-4 w-4" />
+                                  Import
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Pagination */}
+                    <div className="flex justify-center gap-3 mt-6">
+                      <button
+                        onClick={() => setCjPage(p => Math.max(1, p - 1))}
+                        disabled={cjPage === 1}
+                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Previous
+                      </button>
+                      <span className="px-4 py-2 text-gray-600">
+                        Page {cjPage}
+                      </span>
+                      <button
+                        onClick={() => setCjPage(p => p + 1)}
+                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Manual Add Mode */}
+            {!cjSearchMode && (
+              <form onSubmit={handleAddProduct} className="p-6 space-y-6">
               {submitMessage && (
                 <div className={`p-4 rounded-lg ${
                   submitMessage.type === 'success' 
