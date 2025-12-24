@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { StoreServices } from '@/lib/store-services';
 
+// Force dynamic rendering to avoid static generation issues
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

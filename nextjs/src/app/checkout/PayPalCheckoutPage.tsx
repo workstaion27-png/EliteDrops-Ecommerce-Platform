@@ -534,7 +534,7 @@ export default function CheckoutPage() {
                       return ''
                     }
                   }}
-                  onApprove={async (data, actions) => {
+                  onApprove={async (data: any, actions: any) => {
                     if (actions.order) {
                       const details = await actions.order.capture()
                       await handlePayPalSuccess(details)
