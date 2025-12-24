@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js'
-import { ArrowLeft, ShoppingBag, CreditCard, Truck, Shield, Check } from 'lucide-react'
+import { ArrowLeft, ShoppingBag, CreditCard, Truck, Shield, Check, AlertCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useCartStore } from '@/store/cart'
 import { supabase } from '@/lib/supabase'
+import { StoreServices } from '@/lib/store-services'
 import { paypalScriptOptions } from '@/lib/paypal'
 
 export default function CheckoutPage() {
@@ -16,6 +17,8 @@ export default function CheckoutPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState('')
+  const [cjConversionStatus, setCjConversionStatus] = useState<'pending' | 'processing' | 'success' | 'error'>('pending')
+  const [cjOrderId, setCjOrderId] = useState<string | null>(null)
   const { items, getTotal, clearCart } = useCartStore()
   
   const [formData, setFormData] = useState({
@@ -42,6 +45,43 @@ export default function CheckoutPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  // Check if cart contains CJ products
+  const hasCJProducts = async () => {
+    try {
+      const productIds = items.map(item => item.product.id)
+      const { data: products } = await supabase
+        .from('products')
+        .select('cj_product_id')
+        .in('id', productIds)
+        .not('cj_product_id', 'is', null)
+      
+      return products && products.length > 0
+    } catch (error) {
+      console.error('Error checking CJ products:', error)
+      return false
+    }
+  }
+
+  // Convert order to CJ Dropshipping automatically
+  const convertOrderToCJ = async (orderId: string) => {
+    try {
+      setCjConversionStatus('processing')
+      
+      const cjOrder = await StoreServices.createCJOrder(orderId)
+      
+      setCjConversionStatus('success')
+      setCjOrderId(cjOrder.orderId)
+      
+      console.log('Order converted to CJ successfully:', cjOrder.orderId)
+    } catch (error) {
+      setCjConversionStatus('error')
+      console.error('Failed to convert order to CJ:', error)
+      
+      // Don't block the success flow if CJ conversion fails
+      // Admin can retry manually later
+    }
   }
 
   const createOrder = async () => {
@@ -115,13 +155,19 @@ export default function CheckoutPage() {
           .insert(orderItems)
       }
 
+      // Check if order contains CJ products and convert automatically
+      const hasCJ = await hasCJProducts()
+      if (hasCJ) {
+        await convertOrderToCJ(orderId)
+      }
+
       setSuccess(true)
       setOrderNumber(orderNumber)
       clearCart()
       
     } catch (error) {
       console.error('Order confirmation error:', error)
-      setError('An error occurred while confirming the order')
+      setError('حدث خطأ أثناء تأكيد الطلب')
     } finally {
       setLoading(false)
     }
@@ -129,7 +175,7 @@ export default function CheckoutPage() {
 
   const handlePayPalError = (error: any) => {
     console.error('PayPal error:', error)
-    setError('Payment processing failed')
+    setError('فشل في معالجة الدفع')
   }
 
   if (success) {
@@ -141,18 +187,66 @@ export default function CheckoutPage() {
               <Check className="h-8 w-8 text-green-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Order Confirmed!</h1>
-            <p className="text-slate-600 mb-4">
+            <p className="text-slate-600 mb-2">
               Order Number: <strong>{orderNumber}</strong>
             </p>
-            <p className="text-slate-600 mb-6">
-              Thank you for your order! A confirmation with details will be sent to your email.
+            
+            {/* CJ Conversion Status */}
+            {cjConversionStatus !== 'pending' && (
+              <div className="mt-6 p-4 rounded-lg border-2 border-dashed border-slate-200">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">تأكيد الطلب</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-center gap-2">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-sm text-slate-600">تم تأكيد الطلب بنجاح</span>
+                  </div>
+                  
+                  {cjConversionStatus === 'processing' && (
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
+                      <span className="text-sm text-slate-600">جاري إرسال الطلب إلى CJ Dropshipping...</span>
+                    </div>
+                  )}
+                  
+                  {cjConversionStatus === 'success' && cjOrderId && (
+                    <div className="flex items-center justify-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm text-slate-600">تم إرسال الطلب إلى CJ بنجاح</span>
+                    </div>
+                  )}
+                  
+                  {cjConversionStatus === 'success' && cjOrderId && (
+                    <div className="text-xs text-slate-500 mt-2">
+                      CJ Order ID: {cjOrderId}
+                    </div>
+                  )}
+                  
+                  {cjConversionStatus === 'error' && (
+                    <div className="flex items-center justify-center gap-2">
+                      <AlertCircle className="h-4 w-4 text-yellow-600" />
+                      <span className="text-sm text-slate-600">سيتم إرسال الطلب يدوياً من قبل الإدارة</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            <p className="text-slate-600 mb-6 mt-4">
+              شكراً لك على طلبك! سيتم إرسال رسالة تأكيد بالتفاصيل إلى بريدك الإلكتروني.
             </p>
-            <Link 
-              href="/products"
-              className="inline-flex items-center px-6 py-3 bg-sky-600 text-white font-semibold rounded-lg hover:bg-sky-700 transition-colors"
-            >
-              Continue Shopping
-            </Link>
+            
+            <div className="space-y-3">
+              <Link 
+                href="/products"
+                className="inline-flex items-center px-6 py-3 bg-sky-600 text-white font-semibold rounded-lg hover:bg-sky-700 transition-colors"
+              >
+                Continue Shopping
+              </Link>
+              
+              <div className="text-sm text-slate-500">
+                تحتاج مساعدة؟ تواصل معنا على: support@luxuryhub.com
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -165,8 +259,8 @@ export default function CheckoutPage() {
         <div className="max-w-2xl mx-auto px-4 py-16">
           <div className="bg-white rounded-xl p-8 text-center">
             <ShoppingBag className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Cart is Empty</h1>
-            <p className="text-slate-600 mb-6">Add some products to your cart first</p>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">السلة فارغة</h1>
+            <p className="text-slate-600 mb-6">أضف بعض المنتجات إلى سلتك أولاً</p>
             <Link 
               href="/products"
               className="inline-flex items-center px-6 py-3 bg-sky-600 text-white font-semibold rounded-lg hover:bg-sky-700 transition-colors"
@@ -427,7 +521,7 @@ export default function CheckoutPage() {
                   createOrder={async () => {
                     if (!formData.email || !formData.firstName || !formData.lastName || 
                         !formData.address || !formData.city || !formData.state || !formData.zip) {
-                      setError('Please fill in all required fields')
+                      setError('يرجى ملء جميع الحقول المطلوبة')
                       return ''
                     }
                     
@@ -436,7 +530,7 @@ export default function CheckoutPage() {
                       return orderNumber
                     } catch (error) {
                       console.error('Error creating order:', error)
-                      setError('Failed to create order')
+                      setError('فشل في إنشاء الطلب')
                       return ''
                     }
                   }}
@@ -448,7 +542,7 @@ export default function CheckoutPage() {
                   }}
                   onError={handlePayPalError}
                   onCancel={() => {
-                    setError('Payment was cancelled')
+                    setError('تم إلغاء الدفع')
                   }}
                 />
               </PayPalScriptProvider>
