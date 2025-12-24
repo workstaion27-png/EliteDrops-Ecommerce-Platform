@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { 
   LogOut, 
   Package, 
@@ -26,7 +27,10 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  ShoppingBag
+  ShoppingBag,
+  X,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react'
 import OrderManagement from '@/components/admin/OrderManagement'
 import CJDropshippingIntegration from '@/components/admin/CJDropshippingIntegration'
@@ -43,10 +47,13 @@ interface Order {
 interface Product {
   id: string
   name: string
+  description?: string
   category: string
   price: number
   stock: number
   status: string
+  image_url?: string
+  created_at?: string
 }
 
 interface Customer {
@@ -56,6 +63,16 @@ interface Customer {
   orders: number
   total: number
   joinDate: string
+}
+
+interface NewProductData {
+  name: string
+  description: string
+  category: string
+  price: number
+  stock: number
+  image_url: string
+  is_active: boolean
 }
 
 export default function AdminPanel() {
@@ -71,8 +88,23 @@ export default function AdminPanel() {
     totalProducts: 0,
     totalCustomers: 0
   })
+  
+  // Add Product Modal States
+  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [newProduct, setNewProduct] = useState<NewProductData>({
+    name: '',
+    description: '',
+    category: '',
+    price: 0,
+    stock: 0,
+    image_url: '',
+    is_active: true
+  })
+  const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
   const router = useRouter()
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -135,6 +167,85 @@ export default function AdminPanel() {
       localStorage.removeItem('luxuryhub_admin_session')
     }
     router.push('/admin-control/login')
+  }
+
+  const handleAddProduct = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitMessage(null)
+
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .insert([{
+          name: newProduct.name,
+          description: newProduct.description,
+          category: newProduct.category,
+          price: newProduct.price,
+          stock: newProduct.stock,
+          image_url: newProduct.image_url || null,
+          is_active: newProduct.is_active
+        }])
+        .select()
+
+      if (error) {
+        throw error
+      }
+
+      setSubmitMessage({ type: 'success', text: 'تم إضافة المنتج بنجاح!' })
+      
+      // Reset form and refresh products list
+      setNewProduct({
+        name: '',
+        description: '',
+        category: '',
+        price: 0,
+        stock: 0,
+        image_url: '',
+        is_active: true
+      })
+      
+      // Refresh products list
+      loadDashboardData()
+      
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        setIsAddProductModalOpen(false)
+        setSubmitMessage(null)
+      }, 2000)
+
+    } catch (error: any) {
+      console.error('Error adding product:', error)
+      setSubmitMessage({ type: 'error', text: `حدث خطأ: ${error.message || 'حدث خطأ غير معروف'}` })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target
+    setNewProduct(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    }))
+  }
+
+  const closeModal = () => {
+    setIsAddProductModalOpen(false)
+    setSubmitMessage(null)
+    setNewProduct({
+      name: '',
+      description: '',
+      category: '',
+      price: 0,
+      stock: 0,
+      image_url: '',
+      is_active: true
+    })
+  }
+
+  const openAddProductModal = () => {
+    setIsAddProductModalOpen(true)
   }
 
   const getStatusColor = (status: string) => {
@@ -365,10 +476,13 @@ export default function AdminPanel() {
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold text-gray-900">Product Management</h3>
           <div className="flex items-center gap-4">
-            <button className="flex items-center px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Product
-            </button>
+            <button 
+                onClick={openAddProductModal}
+                className="flex items-center px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                إضافة منتج
+              </button>
             <div className="relative">
               <Search className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
@@ -574,10 +688,10 @@ export default function AdminPanel() {
   const renderSettings = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Store Settings</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">إعدادات المتجر</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Store Name</label>
+            <label className="block text-sm font-medium text-gray-700">اسم المتجر</label>
             <input
               type="text"
               defaultValue="LuxuryHub"
@@ -585,7 +699,7 @@ export default function AdminPanel() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Store Description</label>
+            <label className="block text-sm font-medium text-gray-700">وصف المتجر</label>
             <textarea
               defaultValue="Curated luxury lifestyle products with uncompromising quality and exceptional service"
               className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
@@ -593,7 +707,7 @@ export default function AdminPanel() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Contact Email</label>
+            <label className="block text-sm font-medium text-gray-700">البريد الإلكتروني</label>
             <input
               type="email"
               defaultValue="support@luxuryhub.com"
@@ -601,7 +715,7 @@ export default function AdminPanel() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <label className="block text-sm font-medium text-gray-700">رقم الهاتف</label>
             <input
               type="tel"
               defaultValue="+1 (555) 123-4567"
@@ -611,16 +725,16 @@ export default function AdminPanel() {
         </div>
         <div className="mt-6">
           <button className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700">
-            Save Changes
+            حفظ التغييرات
           </button>
         </div>
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Shipping Settings</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">إعدادات الشحن</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Free Shipping Minimum</label>
+            <label className="block text-sm font-medium text-gray-700">الحد الأدنى للشحن المجاني</label>
             <input
               type="number"
               defaultValue="0"
@@ -628,7 +742,7 @@ export default function AdminPanel() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Standard Shipping (days)</label>
+            <label className="block text-sm font-medium text-gray-700">الشحن العادي (أيام)</label>
             <input
               type="text"
               defaultValue="3-5 business days"
@@ -638,12 +752,223 @@ export default function AdminPanel() {
         </div>
         <div className="mt-6">
           <button className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700">
-            Update Shipping
+            تحديث الشحن
           </button>
         </div>
       </div>
     </div>
   )
+
+  const renderAddProductModal = () => {
+    if (!isAddProductModalOpen) return null
+
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="flex min-h-full items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+            onClick={closeModal}
+          />
+          
+          {/* Modal */}
+          <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Plus className="h-5 w-5 text-amber-600" />
+                إضافة منتج جديد
+              </h3>
+              <button
+                onClick={closeModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleAddProduct} className="p-6 space-y-6">
+              {submitMessage && (
+                <div className={`p-4 rounded-lg ${
+                  submitMessage.type === 'success' 
+                    ? 'bg-green-50 text-green-800 border border-green-200' 
+                    : 'bg-red-50 text-red-800 border border-red-200'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    {submitMessage.type === 'success' ? (
+                      <CheckCircle className="h-5 w-5" />
+                    ) : (
+                      <AlertCircle className="h-5 w-5" />
+                    )}
+                    {submitMessage.text}
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Product Name */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    اسم المنتج *
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={newProduct.name}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="أدخل اسم المنتج"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    الفئة *
+                  </label>
+                  <select
+                    name="category"
+                    value={newProduct.category}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  >
+                    <option value="">اختر الفئة</option>
+                    <option value="electronics">إلكترونيات</option>
+                    <option value="clothing">ملابس</option>
+                    <option value="home">منزل وحديقة</option>
+                    <option value="beauty">تجميل وعناية شخصية</option>
+                    <option value="sports">رياضة وملابس رياضية</option>
+                    <option value="toys">ألعاب وهوايات</option>
+                    <option value="other">أخرى</option>
+                  </select>
+                </div>
+
+                {/* Price */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    السعر ($) *
+                  </label>
+                  <input
+                    type="number"
+                    name="price"
+                    value={newProduct.price}
+                    onChange={handleInputChange}
+                    required
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Stock */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    الكمية *
+                  </label>
+                  <input
+                    type="number"
+                    name="stock"
+                    value={newProduct.stock}
+                    onChange={handleInputChange}
+                    required
+                    min="0"
+                    placeholder="0"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Image URL */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    رابط الصورة
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      name="image_url"
+                      value={newProduct.image_url}
+                      onChange={handleInputChange}
+                      placeholder="https://example.com/image.jpg"
+                      className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    />
+                    <div className="relative group">
+                      <div className="p-2 bg-gray-100 rounded-lg border border-gray-300 cursor-help">
+                        <ImageIcon className="h-5 w-5 text-gray-500" />
+                      </div>
+                      <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-white text-xs rounded-lg">
+                        أدخل رابط مباشر للصورة
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    الوصف
+                  </label>
+                  <textarea
+                    name="description"
+                    value={newProduct.description}
+                    onChange={handleInputChange}
+                    rows={4}
+                    placeholder="أدخل وصف المنتج..."
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Active Status */}
+                <div className="md:col-span-2">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="is_active"
+                      checked={newProduct.is_active}
+                      onChange={handleInputChange}
+                      className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
+                    />
+                    <span className="text-sm font-medium text-gray-700">تفعيل المنتج فوراً</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex items-center gap-2 px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      جاري الإضافة...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4" />
+                      إضافة المنتج
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -711,6 +1036,9 @@ export default function AdminPanel() {
         {activeTab === 'analytics' && renderAnalytics()}
         {activeTab === 'settings' && renderSettings()}
       </div>
+
+      {/* Add Product Modal */}
+      {renderAddProductModal()}
     </div>
   )
 }
