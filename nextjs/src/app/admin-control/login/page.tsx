@@ -11,16 +11,18 @@ export default function AdminLogin() {
   const [error, setError] = useState('')
   const router = useRouter()
 
-  const defaultUsername = 'luxuryhub_admin'
-  const defaultPassword = 'admin123456'
+  // Admin credentials should be configured via environment variables
+  // For production: set ADMIN_USERNAME and ADMIN_PASSWORD in .env
+  const adminUsername = process.env.NEXT_PUBLIC_ADMIN_USERNAME || 'admin'
+  const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'secure_password'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    // Mock authentication
-    if (username === defaultUsername && password === defaultPassword) {
+    // Authentication check
+    if (username === adminUsername && password === adminPassword) {
       // Create session
       const session = {
         isAuthenticated: true,
@@ -118,14 +120,6 @@ export default function AdminLogin() {
               </span>
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
-          </div>
-
-          <div className="text-center">
-            <p className="text-xs text-slate-500">
-              Demo credentials: <br />
-              Username: <code className="bg-slate-100 px-1 rounded">luxuryhub_admin</code><br />
-              Password: <code className="bg-slate-100 px-1 rounded">admin123456</code>
-            </p>
           </div>
         </form>
       </div>
