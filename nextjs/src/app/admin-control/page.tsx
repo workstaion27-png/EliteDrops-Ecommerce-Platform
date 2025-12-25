@@ -98,6 +98,9 @@ export default function AdminPanel() {
   const [orders, setOrders] = useState<Order[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [customers, setCustomers] = useState<Customer[]>([])
+  const [reviews, setReviews] = useState<any[]>([])
+  const [uploadedImages, setUploadedImages] = useState<any[]>([])
+  const [editingProduct, setEditingProduct] = useState<any>(null)
   const [dashboardStats, setDashboardStats] = useState({
     totalOrders: 0,
     totalRevenue: 0,
@@ -127,6 +130,17 @@ export default function AdminPanel() {
   const [cjPage, setCjPage] = useState(1)
   const [cjImporting, setCjImporting] = useState<{ [key: string]: string }>({})
   const [cjError, setCjError] = useState<string | null>(null)
+  
+  // Image Upload States
+  const [imageUploadLoading, setImageUploadLoading] = useState(false)
+  const [dragActive, setDragActive] = useState(false)
+  
+  // Product Edit States
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editProduct, setEditProduct] = useState<any>(null)
+  
+  // Reviews States
+  const [reviewFilter, setReviewFilter] = useState('all')
 
   const router = useRouter()
 
@@ -355,6 +369,155 @@ export default function AdminPanel() {
       image_url: '',
       is_active: true
     })
+  }
+
+  // Image Upload Functions
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+    
+    setImageUploadLoading(true)
+    const newImages: any[] = []
+    
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert(`الملف ${file.name} ليس صورة صحيحة`)
+          continue
+        }
+        
+        // Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+          alert(`الملف ${file.name} أكبر من 5 ميجابايت`)
+          continue
+        }
+        
+        // For demo purposes, we'll create a local URL
+        // In production, you would upload to a storage service
+        const imageUrl = URL.createObjectURL(file)
+        newImages.push({
+          url: imageUrl,
+          name: file.name,
+          size: file.size,
+          type: file.type
+        })
+      }
+      
+      setUploadedImages(prev => [...prev, ...newImages])
+      setSubmitMessage({ type: 'success', text: `تم رفع ${newImages.length} صورة بنجاح!` })
+      
+      // Clear message after 3 seconds
+      setTimeout(() => setSubmitMessage(null), 3000)
+      
+    } catch (error: any) {
+      console.error('Error uploading images:', error)
+      setSubmitMessage({ type: 'error', text: 'حدث خطأ أثناء رفع الصور' })
+    } finally {
+      setImageUploadLoading(false)
+    }
+  }
+  
+  const copyImageUrl = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url)
+      setSubmitMessage({ type: 'success', text: 'تم نسخ الرابط!' })
+      setTimeout(() => setSubmitMessage(null), 2000)
+    } catch (error) {
+      console.error('Failed to copy URL:', error)
+    }
+  }
+  
+  const deleteImage = (index: number) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index))
+    setSubmitMessage({ type: 'success', text: 'تم حذف الصورة!' })
+    setTimeout(() => setSubmitMessage(null), 2000)
+  }
+  
+  // Product Edit Functions
+  const openEditProduct = (product: Product) => {
+    setEditProduct({ ...product })
+    setIsEditModalOpen(true)
+  }
+  
+  const handleEditProduct = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editProduct) return
+    
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({
+          name: editProduct.name,
+          description: editProduct.description,
+          category: editProduct.category,
+          price: editProduct.price,
+          stock: editProduct.stock,
+          image_url: editProduct.image_url,
+          is_active: editProduct.is_active
+        })
+        .eq('id', editProduct.id)
+      
+      if (error) throw error
+      
+      setSubmitMessage({ type: 'success', text: 'تم تحديث المنتج بنجاح!' })
+      loadDashboardData()
+      
+      setTimeout(() => {
+        setIsEditModalOpen(false)
+        setEditProduct(null)
+        setSubmitMessage(null)
+      }, 2000)
+      
+    } catch (error: any) {
+      console.error('Error updating product:', error)
+      setSubmitMessage({ type: 'error', text: `حدث خطأ: ${error.message}` })
+    }
+  }
+  
+  // Reviews Functions
+  const updateReviewStatus = async (reviewId: string, status: string) => {
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .update({ status })
+        .eq('id', reviewId)
+      
+      if (error) throw error
+      
+      setReviews(prev => prev.map(review => 
+        review.id === reviewId ? { ...review, status } : review
+      ))
+      
+      setSubmitMessage({ type: 'success', text: 'تم تحديث حالة المراجعة!' })
+      setTimeout(() => setSubmitMessage(null), 2000)
+      
+    } catch (error: any) {
+      console.error('Error updating review:', error)
+      setSubmitMessage({ type: 'error', text: 'حدث خطأ في تحديث المراجعة' })
+    }
+  }
+  
+  const deleteReview = async (reviewId: string) => {
+    if (!confirm('هل أنت متأكد من حذف هذه المراجعة؟')) return
+    
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', reviewId)
+      
+      if (error) throw error
+      
+      setReviews(prev => prev.filter(review => review.id !== reviewId))
+      setSubmitMessage({ type: 'success', text: 'تم حذف المراجعة!' })
+      setTimeout(() => setSubmitMessage(null), 2000)
+      
+    } catch (error: any) {
+      console.error('Error deleting review:', error)
+      setSubmitMessage({ type: 'error', text: 'حدث خطأ في حذف المراجعة' })
+    }
   }
 
   const getStatusColor = (status: string) => {
@@ -646,7 +809,10 @@ export default function AdminPanel() {
                     <button className="text-amber-600 hover:text-amber-900">
                       <Eye className="h-4 w-4" />
                     </button>
-                    <button className="text-blue-600 hover:text-blue-900">
+                    <button 
+                      onClick={() => openEditProduct(product)}
+                      className="text-blue-600 hover:text-blue-900"
+                    >
                       <Edit className="h-4 w-4" />
                     </button>
                     <button className="text-red-600 hover:text-red-900">
@@ -863,6 +1029,230 @@ export default function AdminPanel() {
           <button className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700">
             تحديث الشحن
           </button>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderImageUpload = () => (
+    <div className="space-y-6">
+      {/* Upload Area */}
+      <div className="bg-white rounded-lg shadow">
+        <div className="p-6 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">رفع الصور</h3>
+          <p className="text-sm text-gray-500 mt-1">ارفع صور المنتجات والإكسسوارات</p>
+        </div>
+        <div className="p-6">
+          <div 
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              dragActive 
+                ? 'border-amber-500 bg-amber-50' 
+                : 'border-gray-300 hover:border-amber-400'
+            }`}
+            onDragEnter={(e) => {
+              e.preventDefault()
+              setDragActive(true)
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault()
+              setDragActive(false)
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault()
+              setDragActive(false)
+              handleImageUpload(e.dataTransfer.files)
+            }}
+          >
+            <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-lg font-medium text-gray-900 mb-2">اسحب الصور هنا أو انقر للاختيار</p>
+            <p className="text-sm text-gray-500 mb-4">PNG, JPG, WEBP حتى 5 ميجابايت</p>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e.target.files)}
+              className="hidden"
+              id="image-upload"
+            />
+            <label
+              htmlFor="image-upload"
+              className="inline-flex items-center px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 cursor-pointer"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              اختر الصور
+            </label>
+            {imageUploadLoading && (
+              <div className="mt-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-600 mx-auto"></div>
+                <p className="text-sm text-gray-500 mt-2">جاري رفع الصور...</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Uploaded Images Gallery */}
+      <div className="bg-white rounded-lg shadow">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-900">معرض الصور المرفوعة</h3>
+            <span className="text-sm text-gray-500">{uploadedImages.length} صورة</span>
+          </div>
+        </div>
+        <div className="p-6">
+          {uploadedImages.length === 0 ? (
+            <div className="text-center py-8">
+              <ImageIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">لا توجد صور مرفوعة بعد</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+              {uploadedImages.map((image, index) => (
+                <div key={index} className="relative group">
+                  <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                    <img
+                      src={image.url}
+                      alt={image.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/150x150?text=Error'
+                      }}
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => copyImageUrl(image.url)}
+                        className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                        title="نسخ الرابط"
+                      >
+                        <Globe className="h-4 w-4 text-gray-700" />
+                      </button>
+                      <button
+                        onClick={() => deleteImage(index)}
+                        className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                        title="حذف"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500 truncate" title={image.name}>
+                      {image.name}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderReviews = () => (
+    <div className="space-y-6">
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-900">إدارة المراجعات</h3>
+            <div className="flex items-center gap-4">
+              <select
+                value={reviewFilter}
+                onChange={(e) => setReviewFilter(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              >
+                <option value="all">جميع المراجعات</option>
+                <option value="pending">في الانتظار</option>
+                <option value="approved">موافق عليها</option>
+                <option value="rejected">مرفوضة</option>
+              </select>
+              <div className="relative">
+                <Search className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="البحث في المراجعات..."
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="p-6">
+          {reviews.length === 0 ? (
+            <div className="text-center py-8">
+              <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">لا توجد مراجعات بعد</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {reviews.map((review) => (
+                <div key={review.id} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-gray-900">{review.customer_name}</span>
+                        <div className="flex items-center">
+                          {[...Array(5)].map((_, i) => (
+                            <span
+                              key={i}
+                              className={`text-sm ${
+                                i < review.rating ? 'text-yellow-400' : 'text-gray-300'
+                              }`}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-500">{review.product_name} • {new Date(review.created_at).toLocaleDateString('ar')}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        review.status === 'approved' ? 'bg-green-100 text-green-800' :
+                        review.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {review.status === 'approved' ? 'موافق عليها' :
+                         review.status === 'rejected' ? 'مرفوضة' : 'في الانتظار'}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-gray-700 mb-3">{review.content}</p>
+                  <div className="flex gap-2">
+                    {review.status === 'pending' && (
+                      <>
+                        <button
+                          onClick={() => updateReviewStatus(review.id, 'approved')}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                          موافقة
+                        </button>
+                        <button
+                          onClick={() => updateReviewStatus(review.id, 'rejected')}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                        >
+                          <XCircle className="h-4 w-4" />
+                          رفض
+                        </button>
+                      </>
+                    )}
+                    <button
+                      onClick={() => deleteReview(review.id)}
+                      className="flex items-center gap-1 px-3 py-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      حذف
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -1189,6 +1579,201 @@ export default function AdminPanel() {
     );
   }
 
+  const renderEditProductModal = () => {
+    if (!isEditModalOpen || !editProduct) return null;
+
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="flex min-h-full items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+            onClick={() => {
+              setIsEditModalOpen(false)
+              setEditProduct(null)
+            }}
+          />
+          
+          {/* Modal */}
+          <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Edit className="h-5 w-5 text-blue-600" />
+                تعديل المنتج
+              </h3>
+              <button
+                onClick={() => {
+                  setIsEditModalOpen(false)
+                  setEditProduct(null)
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <form onSubmit={handleEditProduct} className="p-6 space-y-4">
+              {/* Product Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  اسم المنتج *
+                </label>
+                <input
+                  type="text"
+                  value={editProduct.name}
+                  onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })}
+                  required
+                  placeholder="أدخل اسم المنتج"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  الفئة *
+                </label>
+                <select
+                  value={editProduct.category}
+                  onChange={(e) => setEditProduct({ ...editProduct, category: e.target.value })}
+                  required
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">اختر الفئة</option>
+                  <option value="bags">حقائب</option>
+                  <option value="shoes">أحذية</option>
+                  <option value="clothing">ملابس</option>
+                  <option value="accessories">إكسسوارات</option>
+                  <option value="watches">ساعات</option>
+                  <option value="jewelry">مجوهرات</option>
+                  <option value="beauty">جمال</option>
+                  <option value="tech">تقنية</option>
+                </select>
+              </div>
+
+              {/* Price */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  السعر *
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    value={editProduct.price}
+                    onChange={(e) => setEditProduct({ ...editProduct, price: parseFloat(e.target.value) || 0 })}
+                    required
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 pr-12 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <span className="absolute left-3 top-2 text-gray-500">$</span>
+                </div>
+              </div>
+
+              {/* Stock */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  الكمية *
+                </label>
+                <input
+                  type="number"
+                  value={editProduct.stock}
+                  onChange={(e) => setEditProduct({ ...editProduct, stock: parseInt(e.target.value) || 0 })}
+                  required
+                  min="0"
+                  placeholder="0"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Image URL */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  رابط الصورة
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={editProduct.image_url || ''}
+                    onChange={(e) => setEditProduct({ ...editProduct, image_url: e.target.value })}
+                    placeholder="https://example.com/image.jpg"
+                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <div className="relative group">
+                    <div className="p-2 bg-gray-100 rounded-lg border border-gray-300 cursor-help">
+                      <ImageIcon className="h-5 w-5 text-gray-500" />
+                    </div>
+                    <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-white text-xs rounded-lg">
+                      أدخل رابط مباشر للصورة
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  الوصف
+                </label>
+                <textarea
+                  value={editProduct.description || ''}
+                  onChange={(e) => setEditProduct({ ...editProduct, description: e.target.value })}
+                  rows={4}
+                  placeholder="أدخل وصف المنتج..."
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Active Status */}
+              <div>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editProduct.is_active}
+                    onChange={(e) => setEditProduct({ ...editProduct, is_active: e.target.checked })}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <span className="text-sm font-medium text-gray-700">تفعيل المنتج</span>
+                </label>
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditModalOpen(false)
+                    setEditProduct(null)
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="submit"
+                  className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Edit className="h-4 w-4" />
+                  تحديث المنتج
+                </button>
+              </div>
+            </form>
+
+            {/* Submit Message */}
+            {submitMessage && (
+              <div className={`mx-6 mb-6 p-3 rounded-lg ${submitMessage.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                <p className="text-sm">{submitMessage.text}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -1224,6 +1809,8 @@ export default function AdminPanel() {
               { id: 'orders', label: 'Order Management', icon: ShoppingCart },
               { id: 'cj-dropshipping', label: 'CJdropshipping', icon: Truck },
               { id: 'products', label: 'Products', icon: Package },
+              { id: 'image-upload', label: 'Image Upload', icon: ImageIcon },
+              { id: 'reviews', label: 'Reviews', icon: FileText },
               { id: 'customers', label: 'Customers', icon: Users },
               { id: 'analytics', label: 'Analytics', icon: TrendingUp },
               { id: 'settings', label: 'Settings', icon: Settings }
@@ -1251,6 +1838,8 @@ export default function AdminPanel() {
         {activeTab === 'orders' && <OrderManagement />}
         {activeTab === 'cj-dropshipping' && <CJDropshippingIntegration />}
         {activeTab === 'products' && renderProducts()}
+        {activeTab === 'image-upload' && renderImageUpload()}
+        {activeTab === 'reviews' && renderReviews()}
         {activeTab === 'customers' && renderCustomers()}
         {activeTab === 'analytics' && renderAnalytics()}
         {activeTab === 'settings' && renderSettings()}
@@ -1258,6 +1847,9 @@ export default function AdminPanel() {
 
       {/* Add Product Modal */}
       {renderAddProductModal()}
+      
+      {/* Edit Product Modal */}
+      {renderEditProductModal()}
     </div>
   )
 }
