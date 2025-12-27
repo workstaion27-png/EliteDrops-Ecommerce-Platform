@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/lib/types/supabase';
+import type { Database } from '../../../lib/types/supabase';
 import { createTrackingService, CARRIERS } from '@/lib/tracking-service';
 import { createMessagingService } from '@/lib/messaging-service';
 import { generateTrackingUrl } from '@/lib/messaging-service';

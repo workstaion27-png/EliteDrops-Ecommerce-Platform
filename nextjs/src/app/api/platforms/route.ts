@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/lib/types/supabase';
+import type { Database } from '../../../lib/types/supabase';
 
 // تهيئة Supabase
 const supabase = createClient<Database>(

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/lib/types/supabase';
+import type { Database } from '../../../lib/types/supabase';
 import { createMessagingService } from '@/lib/messaging-service';
 import { replaceTemplateVariables } from '@/lib/messaging-service';
 
