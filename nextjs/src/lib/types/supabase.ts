@@ -1,6 +1,9 @@
-// Supabase Database Types - Updated for Vercel Build
-// This file provides TypeScript type definitions for Supabase database tables
+// ============================================================================
+// Supabase Database Types - Vercel Build Compatible Version
+// Last Updated: 2025-12-28 04:46
+// ============================================================================
 
+// Json type for Supabase
 export type Json =
   | string
   | number
@@ -9,6 +12,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
+// Main Database interface
 export interface Database {
   public: {
     Tables: {
