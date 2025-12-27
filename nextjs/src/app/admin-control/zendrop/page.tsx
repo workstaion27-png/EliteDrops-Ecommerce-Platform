@@ -266,7 +266,7 @@ export default function ZendropIntegration() {
             </div>
             <div className="text-right">
               <p className="text-sm text-slate-500">Last Sync</p>
-              <p className="font-medium text-slate-900">{formatDate(status?.lastSync)}</p>
+              <p className="font-medium text-slate-900">{formatDate(status?.lastSync ?? null)}</p>
             </div>
           </div>
         </div>
