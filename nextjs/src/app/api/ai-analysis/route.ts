@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAIService, type AISelectionCriteria, type AIAnalysisResult, type AIRunStats } from '@/lib/ai-product-intelligence';
 import { createClient } from '@/lib/supabase';
-import type { Database } from '@/lib/types/supabase';
+import type { Database } from '../../../../lib/types/supabase';
 
 // نوع بيانات المنتجات الواردة من الموردين
 interface SupplierProduct {

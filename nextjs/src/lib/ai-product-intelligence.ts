@@ -10,7 +10,7 @@
  */
 
 import { createClient } from '@/lib/supabase';
-import type { Database } from '@/lib/types/supabase';
+import type { Database } from './types/supabase';
 
 // أنواع البيانات للمنتج الذكي
 export interface SmartProduct {

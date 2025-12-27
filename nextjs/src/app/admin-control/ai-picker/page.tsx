@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase';
-import type { Database } from '@/lib/types/supabase';
+import type { Database } from '../../../lib/types/supabase';
 
 // أنواع البيانات
 interface AISelectionCriteria {
