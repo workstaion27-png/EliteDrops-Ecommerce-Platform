@@ -6,9 +6,9 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 // Export supabase client instance
 export const supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey)
 
-// Export createClient function for creating new clients
-export function createClient() {
-  return createSupabaseClient(supabaseUrl, supabaseAnonKey)
+// Export createClient function for creating new clients with type support
+export function createClient<T = any>() {
+  return createSupabaseClient<T>(supabaseUrl, supabaseAnonKey)
 }
 
 // Database Types
