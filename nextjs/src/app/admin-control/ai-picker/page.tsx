@@ -1,6 +1,7 @@
 /**
  * AI Smart Product Picker Admin Page
  * صفحة إدارة المنتقي الذكي للمنتجات بالذكاء الاصطناعي
+ * Last updated: 2025-12-28 22:53
  */
 
 'use client';
