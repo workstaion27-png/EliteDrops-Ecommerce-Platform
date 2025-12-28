@@ -209,7 +209,7 @@ const mockProducts = [
 ];
 
 export default function AISmartProductPicker() {
-  const supabase = createClient<Database>();
+  const supabase = createClient();
   
   // حالة الواجهة
   const [activeTab, setActiveTab] = useState<'analyze' | 'history' | 'settings'>('analyze');
