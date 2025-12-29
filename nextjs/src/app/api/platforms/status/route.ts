@@ -1,3 +1,8 @@
+/**
+ * Platforms Status API Route - CJ Dropshipping Only
+ * واجهة برمجة التطبيقات لحالة المنصة - CJ Dropshipping فقط
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../../../lib/types/supabase';
@@ -7,11 +12,12 @@ const supabase = createClient<Database>(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// GET - التحقق من حالة الاتصال بكل منصة
+// GET - التحقق من حالة منصة CJ
 export async function GET() {
   try {
-    const { data: settings, error } = await this.supabase
-      .from('platform_settings')
+    // جلب الإعدادات
+    const { data: settings, error } = await supabase
+      .from('platform_config')
       .select('config')
       .eq('id', 'default')
       .single();
@@ -21,106 +27,97 @@ export async function GET() {
     }
 
     const config = settings?.config || {
-      platform: 'local',
-      local: { enabled: true },
-      zendrop: { enabled: false },
-      appscenic: { enabled: false },
+      platform: 'cj',
+      cj: { enabled: true, appKey: '', secretKey: '' },
     };
 
-    // التحقق من حالة كل منصة
+    // التحقق من حالة CJ
     const status: Record<string, any> = {
       active_platform: config.platform,
       platforms: {},
     };
 
-    // حالة المنصة المحلية
+    // حالة منصة CJ
+    if (config.cj?.enabled && config.cj?.appKey && config.cj?.secretKey) {
+      // فحص الاتصال بـ CJ API
+      const cjConnected = await testCJConnection(config.cj.appKey, config.cj.secretKey);
+      
+      status.platforms.cj = {
+        enabled: true,
+        status: cjConnected ? 'active' : 'connection_failed',
+        apiKey: true,
+        products_count: 0,
+      };
+    } else if (config.cj?.appKey || config.cj?.secretKey) {
+      status.platforms.cj = {
+        enabled: true,
+        status: 'not_configured',
+        apiKey: false,
+        products_count: 0,
+      };
+    } else {
+      status.platforms.cj = {
+        enabled: false,
+        status: 'disabled',
+        apiKey: false,
+        products_count: 0,
+      };
+    }
+
+    // جلب عدد منتجات CJ
+    const { count: cjCount } = await supabase
+      .from('products')
+      .select('*', { count: 'exact', head: true })
+      .eq('source', 'cj');
+    status.platforms.cj.products_count = cjCount || 0;
+
+    // جلب إجمالي المنتجات (المحلية + CJ)
+    const { count: totalCount } = await supabase
+      .from('products')
+      .select('*', { count: 'exact', head: true });
     status.platforms.local = {
-      enabled: config.local?.enabled ?? true,
+      enabled: true,
       status: 'active',
-      products_count: 0,
+      products_count: totalCount || 0,
     };
-
-    // جلب عدد المنتجات المحلية
-    const { count: localCount } = await supabase
-      .from('products')
-      .select('*', { count: 'exact', head: true })
-      .eq('source', 'local');
-    status.platforms.local.products_count = localCount || 0;
-
-    // التحقق من Zendrop
-    if (config.zendrop?.enabled && config.zendrop?.apiKey) {
-      try {
-        const { createZendropClient } = await import('@/lib/zendrop');
-        const zendropClient = createZendropClient(config.zendrop.apiKey);
-        const connected = await zendropClient.testConnection();
-        
-        status.platforms.zendrop = {
-          enabled: true,
-          status: connected ? 'active' : 'connection_failed',
-          apiKey: !!config.zendrop.apiKey,
-        };
-      } catch {
-        status.platforms.zendrop = {
-          enabled: true,
-          status: 'error',
-          apiKey: true,
-        };
-      }
-    } else {
-      status.platforms.zendrop = {
-        enabled: false,
-        status: config.zendrop?.apiKey ? 'not_configured' : 'disabled',
-        apiKey: false,
-      };
-    }
-
-    // جلب عدد منتجات Zendrop
-    const { count: zendropCount } = await supabase
-      .from('products')
-      .select('*', { count: 'exact', head: true })
-      .eq('source', 'zendrop');
-    status.platforms.zendrop.products_count = zendropCount || 0;
-
-    // التحقق من AppScenic
-    if (config.appscenic?.enabled && config.appscenic?.apiKey) {
-      try {
-        const { createAppScenicClient } = await import('@/lib/appscenic');
-        const appscenicClient = createAppScenicClient(config.appscenic.apiKey);
-        const connected = await appscenicClient.testConnection();
-        
-        status.platforms.appscenic = {
-          enabled: true,
-          status: connected ? 'active' : 'connection_failed',
-          apiKey: !!config.appscenic.apiKey,
-        };
-      } catch {
-        status.platforms.appscenic = {
-          enabled: true,
-          status: 'error',
-          apiKey: true,
-        };
-      }
-    } else {
-      status.platforms.appscenic = {
-        enabled: false,
-        status: config.appscenic?.apiKey ? 'not_configured' : 'disabled',
-        apiKey: false,
-      };
-    }
-
-    // جلب عدد منتجات AppScenic
-    const { count: appscenicCount } = await supabase
-      .from('products')
-      .select('*', { count: 'exact', head: true })
-      .eq('source', 'appscenic');
-    status.platforms.appscenic.products_count = appscenicCount || 0;
 
     return NextResponse.json({ success: true, data: status });
   } catch (error) {
-    console.error('خطأ في فحص حالة المنصات:', error);
+    console.error('خطأ في فحص حالة المنصة:', error);
     return NextResponse.json(
-      { success: false, error: 'فشل فحص حالة المنصات' },
+      { success: false, error: 'فشل فحص حالة المنصة' },
       { status: 500 }
     );
+  }
+}
+
+/**
+ * فحص الاتصال بـ CJ API
+ */
+async function testCJConnection(appKey: string, secretKey: string): Promise<boolean> {
+  try {
+    const crypto = require('crypto');
+    const timestamp = Date.now();
+    const signStr = `appKey${appKey}timestamp${timestamp}`;
+    const sign = crypto
+      .createHmac('sha256', secretKey)
+      .update(signStr)
+      .digest('hex');
+
+    const response = await fetch('https://api.cjdropshipping.com/api/v1/member/get', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-App-Key': appKey,
+        'X-Sign': sign,
+        'X-Timestamp': timestamp.toString(),
+      },
+    });
+
+    const data = await response.json();
+    return data.success === true;
+  } catch (error) {
+    console.error('CJ Connection Test Error:', error);
+    return false;
   }
 }

@@ -1,3 +1,8 @@
+/**
+ * Platforms API Route - CJ Dropshipping Only
+ * واجهة برمجة التطبيقات للمنصات - CJ Dropshipping فقط
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../../../lib/types/supabase';
@@ -11,8 +16,8 @@ const supabase = createClient<Database>(
 // GET - جلب إعدادات المنصات
 export async function GET() {
   try {
-    const { data: settings, error } = await this.supabase
-      .from('platform_settings')
+    const { data: settings, error } = await supabase
+      .from('platform_config')
       .select('*')
       .eq('id', 'default')
       .single();
@@ -22,10 +27,12 @@ export async function GET() {
     }
 
     const defaultConfig = {
-      platform: 'local',
-      local: { enabled: true },
-      zendrop: { enabled: false },
-      appscenic: { enabled: false },
+      platform: 'cj',
+      cj: { 
+        enabled: true, 
+        appKey: '', 
+        secretKey: '' 
+      },
     };
 
     return NextResponse.json({
@@ -44,10 +51,10 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { platform, local, zendrop, appscenic } = body;
+    const { platform, cj } = body;
 
     // التحقق من صحة البيانات
-    const validPlatforms = ['local', 'zendrop', 'appscenic'];
+    const validPlatforms = ['local', 'cj'];
     if (platform && !validPlatforms.includes(platform)) {
       return NextResponse.json(
         { success: false, error: 'منصة غير صالحة' },
@@ -56,44 +63,36 @@ export async function PUT(request: NextRequest) {
     }
 
     // جلب الإعدادات الحالية
-    const { data: currentSettings } = await this.supabase
-      .from('platform_settings')
+    const { data: currentSettings } = await supabase
+      .from('platform_config')
       .select('config')
       .eq('id', 'default')
       .single();
 
     const currentConfig = currentSettings?.config || {
-      platform: 'local',
-      local: { enabled: true },
-      zendrop: { enabled: false },
-      appscenic: { enabled: false },
+      platform: 'cj',
+      cj: { enabled: true, appKey: '', secretKey: '' },
     };
 
     // دمج الإعدادات الجديدة
     const newConfig = {
       ...currentConfig,
       ...(platform && { platform }),
-      ...(local && { local }),
-      ...(zendrop && { 
-        zendrop: { 
-          ...currentConfig.zendrop, 
-          ...zendrop,
-          apiKey: zendrop.apiKey ? '[PROTECTED]' : undefined,
-        } 
-      }),
-      ...(appscenic && { 
-        appscenic: { 
-          ...currentConfig.appscenic, 
-          ...appscenic,
-          apiKey: appscenic.apiKey ? '[PROTECTED]' : undefined,
+      ...(cj && { 
+        cj: { 
+          ...currentConfig.cj, 
+          ...cj,
+          // إخفاء مفاتيح API في الاستجابة
+          appKey: cj.appKey ? '[PROTECTED]' : currentConfig.cj.appKey,
+          secretKey: cj.secretKey ? '[PROTECTED]' : currentConfig.cj.secretKey,
         } 
       }),
       updated_at: new Date().toISOString(),
     };
 
     // حفظ الإعدادات
-    const { error } = await this.supabase
-      .from('platform_settings')
+    const { error } = await supabase
+      .from('platform_config')
       .upsert({
         id: 'default',
         config: newConfig,
@@ -104,17 +103,16 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'تم تحديث إعدادات المنصات بنجاح',
+      message: 'تم تحديث إعدادات المنصة بنجاح',
       data: {
         ...newConfig,
-        zendrop: { ...newConfig.zendrop, apiKey: undefined },
-        appscenic: { ...newConfig.appscenic, apiKey: undefined },
+        cj: { ...newConfig.cj, appKey: '', secretKey: '' },
       },
     });
   } catch (error) {
-    console.error('خطأ في تحديث إعدادات المنصات:', error);
+    console.error('خطأ في تحديث إعدادات المنصة:', error);
     return NextResponse.json(
-      { success: false, error: 'فشل تحديث إعدادات المنصات' },
+      { success: false, error: 'فشل تحديث إعدادات المنصة' },
       { status: 500 }
     );
   }
