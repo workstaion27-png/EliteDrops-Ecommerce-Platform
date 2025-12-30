@@ -132,33 +132,38 @@ export default function SeedRealProductsPage() {
           <div className="text-center">
             <span className="text-6xl mb-4 block">🚀</span>
             <h2 className="text-2xl font-bold text-white mb-4">
-              إضافة 8 منتجات حقيقية من CJDropshipping
+              إضافة 30 منتج حقيقي من CJDropshipping
             </h2>
             <p className="text-purple-300 mb-6 max-w-2xl mx-auto">
-              هذه المنتجات حقيقية ومُختبرة مع مستودع أمريكا للشحن السريع (3-5 أيام) 
+              منتجات حقيقية ومُختبرة مع مستودع أمريكا للشحن السريع (3-5 أيام) 
               وهوامش ربح تتراوح بين 23% و 43%
             </p>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm">
-              <div className="bg-green-900/30 rounded-lg p-3">
-                <span className="text-green-400">✅</span>
-                <p className="text-white font-bold">مساج يد هوائي</p>
-                <p className="text-green-400">ربح $20 (40%)</p>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 text-sm">
+              <div className="bg-purple-900/30 rounded-lg p-3">
+                <span className="text-purple-400">💪</span>
+                <p className="text-white font-bold">8 منتجات صحة</p>
+                <p className="text-green-400">ربح $9-39</p>
               </div>
-              <div className="bg-green-900/30 rounded-lg p-3">
-                <span className="text-green-400">✅</span>
-                <p className="text-white font-bold">قناع LED للوجه</p>
-                <p className="text-green-400">ربح $39 (43%)</p>
+              <div className="bg-blue-900/30 rounded-lg p-3">
+                <span className="text-blue-400">⚡</span>
+                <p className="text-white font-bold">8 منتجات إلكترونيات</p>
+                <p className="text-green-400">ربح $8-85</p>
               </div>
-              <div className="bg-green-900/30 rounded-lg p-3">
-                <span className="text-green-400">✅</span>
-                <p className="text-white font-bold">سكوتر كهربائي</p>
-                <p className="text-green-400">ربح $85 (28%)</p>
+              <div className="bg-orange-900/30 rounded-lg p-3">
+                <span className="text-orange-400">🏠</span>
+                <p className="text-white font-bold">6 منتجات منزل</p>
+                <p className="text-green-400">ربح $6-25</p>
               </div>
-              <div className="bg-green-900/30 rounded-lg p-3">
-                <span className="text-green-400">✅</span>
-                <p className="text-white font-bold">أجهزة أذن بلوتوث</p>
-                <p className="text-green-400">ربح $26 (43%)</p>
+              <div className="bg-yellow-900/30 rounded-lg p-3">
+                <span className="text-yellow-400">🐾</span>
+                <p className="text-white font-bold">3 منتجات حيوانات</p>
+                <p className="text-green-400">ربح $6-17</p>
+              </div>
+              <div className="bg-pink-900/30 rounded-lg p-3">
+                <span className="text-pink-400">👗</span>
+                <p className="text-white font-bold">5 منتجات أزياء</p>
+                <p className="text-green-400">ربح $2-17</p>
               </div>
             </div>
 
@@ -174,12 +179,12 @@ export default function SeedRealProductsPage() {
               {seeding ? (
                 <>
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                  جاري إضافة المنتجات...
+                  جاري إضافة 30 منتج...
                 </>
               ) : (
                 <>
                   <span>🚀</span>
-                  إضافة المنتجات الحقيقية الآن
+                  إضافة 30 منتج حقيقي الآن
                 </>
               )}
             </button>
