@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase';
-import { aiProductIntelligence } from '@/lib/ai-product-intelligence';
+import { createAIService, AIAnalysisResult } from '@/lib/ai-product-intelligence';
 import { CJProduct } from '@/lib/cjdropshipping';
 
 interface ImportRequest {
@@ -128,14 +128,20 @@ export async function POST(request: NextRequest) {
     let importedCount = 0;
     let rejectedCount = 0;
 
+    // إنشاء خدمة الذكاء الاصطناعي
+    const aiService = createAIService({
+      min_profit_margin: minProfitMargin,
+      max_products_per_run: maxProducts
+    });
+
     // فحص المنتجات المضافة سابقاً اليوم
     const today = new Date().toISOString().split('T')[0];
     const { data: todayImports } = await supabase
       .from('ai_product_analysis')
-      .select('product_id')
-      .gte('analyzed_at', `${today}T00:00:00`);
+      .select('product_data')
+      .gte('created_at', `${today}T00:00:00`);
 
-    const importedProductIds = new Set(todayImports?.map(p => p.product_id) || []);
+    const importedProductIds = new Set(todayImports?.map((p: any) => p.product_data?.id) || []);
 
     for (const product of products.slice(0, maxProducts * 3)) {
       // تخطي المنتجات المضافة سابقاً
@@ -143,31 +149,23 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      // تحليل المنتج
-      const analysisResult = await aiProductIntelligence.analyzeProduct(
-        {
-          id: product.id,
-          productName: product.name,
-          sellPrice: product.sellPrice || product.price,
-          costPrice: product.price,
-          categoryName: product.category,
-          imageUrl: product.image,
-          productUrl: product.productUrl || '',
-          description: product.description,
-        },
-        {
-          keywords,
-          excludeWords,
-          minProfitMargin,
-          minScore,
-        }
-      );
+      // تحليل المنتج باستخدام الذكاء الاصطناعي
+      const analysisResult = aiService.analyzeProduct({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        shipping_cost: 4.99,
+        rating: 4.5,
+        review_count: 50,
+        orders_count: 200,
+        category: product.category
+      });
 
       // حفظ النتيجة
-      await aiProductIntelligence.saveAnalysisResult(analysisResult);
+      await aiService.saveAnalysisResults([analysisResult], `run_${Date.now()}`);
 
       // إذا تمت الموافقة، إضافة المنتج إلى قاعدة البيانات
-      if (analysisResult.decision === 'approved') {
+      if (analysisResult.decision === 'APPROVED') {
         await importProductToDatabase(supabase, product, analysisResult);
         importedCount++;
       } else {
@@ -175,9 +173,9 @@ export async function POST(request: NextRequest) {
       }
 
       results.push({
-        product_id: analysisResult.product_id,
-        title: analysisResult.title,
-        score: analysisResult.score,
+        product_id: analysisResult.product.id,
+        title: analysisResult.product.name,
+        score: analysisResult.ai_score,
         decision: analysisResult.decision,
         details: analysisResult,
       });
@@ -277,7 +275,7 @@ function generateCJSign(appKey: string, secretKey: string, timestamp: number): s
 async function importProductToDatabase(
   supabase: any,
   product: CJProduct,
-  analysisResult: any
+  analysisResult: AIAnalysisResult
 ): Promise<void> {
   try {
     // التحقق من وجود المنتج أولاً
@@ -294,19 +292,19 @@ async function importProductToDatabase(
 
     // إنشاء المنتج الجديد
     const { error: insertError } = await supabase.from('products').insert({
-      name: analysisResult.optimized_title || product.name,
+      name: analysisResult.product.name || product.name,
       description: product.description || '',
       price: product.sellPrice || product.price,
       compare_at_price: (product.sellPrice || product.price) * 1.3,
       cost_price: product.price,
       images: product.image ? [product.image] : [],
       category: product.category || 'Uncategorized',
-      tags: analysisResult.reasoning?.split(', ') || [],
-      status: 'active',
-      source: 'cj',
-      cj_product_id: product.id,
+      tags: analysisResult.reasons || [],
+      status: 'active' as const,
+      sku: `CJ-${product.id.slice(-8)}`,
       stock_quantity: product.stock || 100,
-      ai_score: analysisResult.score,
+      cj_product_id: product.id,
+      ai_score: analysisResult.ai_score,
       is_ai_selected: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
