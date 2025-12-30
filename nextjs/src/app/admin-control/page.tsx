@@ -1808,6 +1808,8 @@ export default function AdminPanel() {
               { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
               { id: 'orders', label: 'Order Management', icon: ShoppingCart },
               { id: 'cj-dropshipping', label: 'CJdropshipping', icon: Truck },
+              { id: 'cj-us-importer', label: '🇺🇸 US Products', icon: Globe, href: '/admin-control/cj-us-importer' },
+              { id: 'us-warehouse', label: 'US Warehouse', icon: Package, href: '/admin-control/us-warehouse-products' },
               { id: 'products', label: 'Products', icon: Package },
               { id: 'image-upload', label: 'Image Upload', icon: ImageIcon },
               { id: 'reviews', label: 'Reviews', icon: FileText },
@@ -1815,18 +1817,33 @@ export default function AdminPanel() {
               { id: 'analytics', label: 'Analytics', icon: TrendingUp },
               { id: 'settings', label: 'Settings', icon: Settings }
             ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3 py-4 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-amber-500 text-amber-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <tab.icon className="h-5 w-5" />
-                {tab.label}
-              </button>
+              tab.href ? (
+                <a
+                  key={tab.id}
+                  href={tab.href}
+                  className={`flex items-center gap-2 px-3 py-4 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-amber-500 text-amber-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <tab.icon className="h-5 w-5" />
+                  {tab.label}
+                </a>
+              ) : (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-3 py-4 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-amber-500 text-amber-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <tab.icon className="h-5 w-5" />
+                  {tab.label}
+                </button>
+              )
             ))}
           </nav>
         </div>
