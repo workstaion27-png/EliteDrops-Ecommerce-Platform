@@ -185,10 +185,18 @@ export interface Database {
           name: string
           description: string
           price: number
+          compare_at_price: number | null
+          cost_price: number | null
           images: string[]
           category: string
-          inventory_count: number
-          is_active: boolean
+          tags: string[]
+          stock_quantity: number
+          status: 'active' | 'draft' | 'archived'
+          sku: string
+          source: string | null
+          cj_product_id: string | null
+          ai_score: number | null
+          is_ai_selected: boolean | null
           zendrop_id?: string
           appscenic_id?: string
           created_at: string
@@ -199,10 +207,18 @@ export interface Database {
           name: string
           description: string
           price: number
+          compare_at_price?: number | null
+          cost_price?: number | null
           images: string[]
           category: string
-          inventory_count: number
-          is_active?: boolean
+          tags?: string[]
+          stock_quantity: number
+          status?: 'active' | 'draft' | 'archived'
+          sku: string
+          source?: string | null
+          cj_product_id?: string | null
+          ai_score?: number | null
+          is_ai_selected?: boolean | null
           zendrop_id?: string
           appscenic_id?: string
           created_at?: string
@@ -213,10 +229,18 @@ export interface Database {
           name?: string
           description?: string
           price?: number
+          compare_at_price?: number | null
+          cost_price?: number | null
           images?: string[]
           category?: string
-          inventory_count?: number
-          is_active?: boolean
+          tags?: string[]
+          stock_quantity?: number
+          status?: 'active' | 'draft' | 'archived'
+          sku?: string
+          source?: string | null
+          cj_product_id?: string | null
+          ai_score?: number | null
+          is_ai_selected?: boolean | null
           zendrop_id?: string
           appscenic_id?: string
           created_at?: string
