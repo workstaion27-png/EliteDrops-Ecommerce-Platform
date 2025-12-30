@@ -511,4 +511,7 @@ export function createAIService(criteria?: Partial<AISelectionCriteria>): AIProd
   return new AIProductIntelligenceService(criteria);
 }
 
+// Alias للـ export للتوافق مع الاستيرادات القديمة
+export const aiProductIntelligence = AIProductIntelligenceService;
+
 export { AIProductIntelligenceService };
