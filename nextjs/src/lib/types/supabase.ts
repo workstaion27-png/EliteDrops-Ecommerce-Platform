@@ -247,8 +247,67 @@ export interface Database {
           updated_at?: string
         }
       }
+      admin_notifications: {
+        Row: {
+          id: string
+          created_at: string
+          title: string
+          message: string | null
+          type: 'order' | 'product' | 'customer' | 'system' | 'payment' | 'shipping'
+          priority: 'low' | 'normal' | 'high' | 'critical'
+          is_read: boolean
+          link: string | null
+          related_entity_id: string | null
+          recipient_id: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          title: string
+          message?: string | null
+          type: 'order' | 'product' | 'customer' | 'system' | 'payment' | 'shipping'
+          priority?: 'low' | 'normal' | 'high' | 'critical'
+          is_read?: boolean
+          link?: string | null
+          related_entity_id?: string | null
+          recipient_id?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          title?: string
+          message?: string | null
+          type?: 'order' | 'product' | 'customer' | 'system' | 'payment' | 'shipping'
+          priority?: 'low' | 'normal' | 'high' | 'critical'
+          is_read?: boolean
+          link?: string | null
+          related_entity_id?: string | null
+          recipient_id?: string | null
+          metadata?: Json | null
+        }
+      }
     }
   }
+}
+
+// Notification types
+export type NotificationType = 'order' | 'product' | 'customer' | 'system' | 'payment' | 'shipping';
+export type NotificationPriority = 'low' | 'normal' | 'high' | 'critical';
+
+export interface AdminNotification {
+  id: string;
+  created_at: string;
+  title: string;
+  message: string | null;
+  type: NotificationType;
+  priority: NotificationPriority;
+  is_read: boolean;
+  link: string | null;
+  related_entity_id: string | null;
+  recipient_id: string | null;
+  metadata: Json | null;
 }
 
 // Helper type for creating Supabase client with full type safety

@@ -32,8 +32,10 @@ import {
   Upload,
   Image as ImageIcon,
   RefreshCw,
-  Globe
+  Globe,
+  Bell
 } from 'lucide-react'
+import NotificationBell from '@/components/NotificationBell'
 import OrderManagement from '@/components/admin/OrderManagement'
 import CJDropshippingIntegration from '@/components/admin/CJDropshippingIntegration'
 
@@ -1784,6 +1786,7 @@ export default function AdminPanel() {
               <h1 className="text-2xl font-bold text-gray-900">LuxuryHub Admin</h1>
             </div>
             <div className="flex items-center gap-4">
+              <NotificationBell />
               <button className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900">
                 <Settings className="h-5 w-5" />
                 Settings
@@ -1815,6 +1818,7 @@ export default function AdminPanel() {
               { id: 'reviews', label: 'Reviews', icon: FileText },
               { id: 'customers', label: 'Customers', icon: Users },
               { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+              { id: 'notifications', label: 'الإشعارات', icon: Bell },
               { id: 'settings', label: 'Settings', icon: Settings }
             ].map((tab) => (
               tab.href ? (
